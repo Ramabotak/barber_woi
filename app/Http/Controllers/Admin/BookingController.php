@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Booking;
+use App\Services\NotificationService;
+use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+
+class BookingController extends Controller
+{
+    public function __construct(protected NotificationService $notificationService)
+    {
+    }
+
+    public function index(Request $request): View
+    {
+        $query = Booking::with(['customer', 'barber.user', 'service', 'schedule', 'payment']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        if ($request->filled('date')) {
+            $query->whereHas('schedule', fn ($q) => $q->whereDate('date', $request->input('date')));
+        }
+
+        $bookings = $query->orderByDesc('created_at')->paginate(20)->withQueryString();
+
+        return view('admin.bookings.index', compact('bookings'));
+    }
+
+    public function show(Booking $booking): View
+    {
+        $booking->load(['customer', 'barber.user', 'service', 'schedule', 'payment', 'review']);
+
+        return view('admin.bookings.show', compact('booking'));
+    }
+
+    public function cancel(Booking $booking): RedirectResponse
+    {
+        abort_if(in_array($booking->status, ['completed', 'cancelled'], true), 422, 'Booking tidak bisa dibatalkan.');
+
+        $booking->update(['status' => 'cancelled']);
+        $this->notificationService->notifyStatusChanged($booking);
+
+        return back()->with('success', "Booking {$booking->booking_code} dibatalkan.");
+    }
+
+    public function refund(Booking $booking): RedirectResponse
+    {
+        abort_unless($booking->status === 'cancelled', 422, 'Refund hanya untuk booking yang dibatalkan.');
+
+        $payment = $booking->payment;
+        abort_unless($payment && $payment->status !== 'refunded', 422, 'Pembayaran tidak dapat direfund.');
+
+        $payment->update(['status' => 'refunded', 'refunded_at' => now()]);
+        $this->notificationService->notifyRefundProcessed($booking);
+
+        return back()->with('success', "Refund untuk booking {$booking->booking_code} diproses.");
+    }
+}
