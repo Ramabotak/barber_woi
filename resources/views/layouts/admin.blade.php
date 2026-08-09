@@ -27,17 +27,25 @@
                    class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors {{ request()->routeIs('admin.services.*') ? 'bg-white/10 font-semibold' : '' }}">
                     Kelola Layanan
                 </a>
-                <a href="#" 
-                   class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors opacity-50 cursor-not-allowed">
-                    Kelola Booking (segera)
+                <a href="{{ route('admin.bookings.index') }}" 
+                   class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors {{ request()->routeIs('admin.bookings.*') ? 'bg-white/10 font-semibold' : '' }}">
+                    Kelola Booking
                 </a>
-                <a href="#" 
-                   class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors opacity-50 cursor-not-allowed">
-                    Laporan (segera)
+                <a href="{{ route('admin.reviews.index') }}" 
+                   class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors {{ request()->routeIs('admin.reviews.*') ? 'bg-white/10 font-semibold' : '' }}">
+                    Ulasan Customer
                 </a>
-                <a href="#" 
-                   class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors opacity-50 cursor-not-allowed">
-                    Pengaturan (segera)
+                <a href="{{ route('admin.reports.index') }}" 
+                   class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors {{ request()->routeIs('admin.reports.*') ? 'bg-white/10 font-semibold' : '' }}">
+                    Laporan
+                </a>
+                <a href="{{ route('admin.settings.edit') }}" 
+                   class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors {{ request()->routeIs('admin.settings.*') ? 'bg-white/10 font-semibold' : '' }}">
+                    Pengaturan
+                </a>
+                <a href="{{ route('notifications.index') }}" 
+                   class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors {{ request()->routeIs('notifications.*') ? 'bg-white/10 font-semibold' : '' }}">
+                    Notifikasi
                 </a>
             </nav>
             <div class="p-4 border-t border-white/10">
@@ -55,5 +63,7 @@
             @yield('content')
         </main>
     </div>
+
+    @stack('scripts')
 </body>
 </html>

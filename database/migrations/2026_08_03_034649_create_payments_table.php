@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
             $table->decimal('amount', 10, 2);
-            $table->string('payment_method', 50); // gopay. dana, seabank, jago
+            $table->string('payment_method', 50)->nullable(); // gopay, dana, seabank, jago - diisi setelah customer pilih metode di Snap
             $table->enum('status', ['pending', 'paid', 'failed', 'expired', 'cancelled', 'refunded' ])->default('pending');
             $table->string('transaction_id', 100)->nullable();
             $table->string('snap_token', 255)->nullable();

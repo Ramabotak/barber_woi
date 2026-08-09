@@ -10,17 +10,12 @@ class RoleMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string  $role
-     * @return \Symfony\Component\HttpFoundation\Response
+     * Mendukung lebih dari satu role, contoh: ->middleware('role:admin,barber')
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        // Cek apakah user sudah login dan rolenya sesuai
-        if (!$request->user() || $request->user()->role !== $role) {
-            // Jika tidak sesuai, tampilkan halaman 403 (Forbidden)
+        // Cek apakah user sudah login dan rolenya termasuk salah satu yang diizinkan
+        if (!$request->user() || !in_array($request->user()->role, $roles, true)) {
             abort(403, 'Akses ditolak. Anda tidak memiliki izin.');
         }
 

@@ -40,7 +40,7 @@ class BarberController extends Controller
             'name'       => 'required|string|max:100',
             'email'      => 'required|email|unique:users,email',
             'password'   => 'required|string|min:8',
-            'phone'      => 'nullable|string|max:20',
+            'phone_number' => 'nullable|string|max:20',
             'experience' => 'nullable|string',
             'photo'      => 'nullable|image|max:2048',  // max 2MB
             'status'     => 'required|in:aktif,libur,cuti,nonaktif',
@@ -58,7 +58,7 @@ class BarberController extends Controller
             'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role'     => 'barber',                  // role otomatis barber
-            'phone'    => $validated['phone'] ?? null,
+            'phone_number' => $validated['phone_number'] ?? null,
         ]);
 
         // Buat data barber yang terhubung ke user tersebut
@@ -89,7 +89,7 @@ class BarberController extends Controller
         $validated = $request->validate([
             'name'       => 'required|string|max:100',
             'email'      => 'required|email|unique:users,email,' . $barber->user_id,
-            'phone'      => 'nullable|string|max:20',
+            'phone_number' => 'nullable|string|max:20',
             'experience' => 'nullable|string',
             'photo'      => 'nullable|image|max:2048',
             'status'     => 'required|in:aktif,libur,cuti,nonaktif',
@@ -100,7 +100,7 @@ class BarberController extends Controller
         $barber->user->update([
             'name'  => $validated['name'],
             'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
+            'phone_number' => $validated['phone_number'] ?? null,
         ]);
 
         // Update password hanya jika diisi

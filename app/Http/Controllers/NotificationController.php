@@ -13,7 +13,13 @@ class NotificationController extends Controller
     {
         $notifications = $request->user()->notifications()->orderByDesc('created_at')->paginate(20);
 
-        return view('notifications.index', compact('notifications'));
+        $layout = match ($request->user()->role) {
+            'admin' => 'layouts.admin',
+            'barber' => 'layouts.barber',
+            default => 'layouts.customer',
+        };
+
+        return view('notifications.index', compact('notifications', 'layout'));
     }
 
     public function markAsRead(Request $request, int $id): RedirectResponse

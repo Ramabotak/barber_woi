@@ -5,11 +5,17 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Review;
+use App\Services\ProfanityFilterService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 
 class ReviewController extends Controller
 {
+    public function __construct(
+        protected ProfanityFilterService $profanityFilter
+    ) {
+    }
+
     public function store(Request $request, Booking $booking): RedirectResponse
     {
         abort_unless($booking->customer_id === $request->user()->id, 403);
@@ -21,11 +27,14 @@ class ReviewController extends Controller
             'comment' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        // Sensor kata kasar sebelum disimpan, biar tidak tampil apa adanya ke publik.
+        $comment = $this->profanityFilter->censor($validated['comment'] ?? null);
+
         Review::create([
             'booking_id' => $booking->id,
             'customer_id' => $request->user()->id,
             'rating' => $validated['rating'],
-            'comment' => $validated['comment'] ?? null,
+            'comment' => $comment,
         ]);
 
         return back()->with('success', 'Terima kasih atas ulasan Anda.');

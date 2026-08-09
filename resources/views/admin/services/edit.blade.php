@@ -1,15 +1,29 @@
-<x-app-layout>
+@extends('layouts.admin')
+
+@section('title', 'Layanan - Barber Woi')
+
+@section('content')
     <div class="p-6 max-w-lg">
         <h1 class="text-2xl font-bold mb-4">Edit Layanan</h1>
 
-        <form action="{{ route('admin.services.update', $service) }}" method="POST" class="space-y-4">
+        <form action="{{ route('admin.services.update', $service) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             @method('PUT')
+            @if($service->photo)
+                <img src="{{ Storage::url($service->photo) }}" alt="{{ $service->service_name }}"
+                     class="w-32 h-32 rounded-lg object-cover mb-2">
+            @endif
             <div>
                 <label class="block text-sm font-medium">Nama Layanan</label>
                 <input type="text" name="service_name" value="{{ old('service_name', $service->service_name) }}" required
                        class="w-full border rounded-lg px-3 py-2">
                 @error('service_name')<p class="text-red-500 text-sm">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Ganti Foto (opsional)</label>
+                <input type="file" name="photo" accept="image/*"
+                       class="w-full border rounded-lg px-3 py-2">
+                @error('photo')<p class="text-red-500 text-sm">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium">Harga (Rp)</label>
@@ -42,4 +56,4 @@
             </button>
         </form>
     </div>
-</x-app-layout>
+@endsection

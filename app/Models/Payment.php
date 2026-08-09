@@ -13,7 +13,7 @@ class Payment extends Model
         'booking_id',
         'amount',
         'payment_method',
-        'payment_status',
+        'status',
         'transaction_id',
         'snap_token',
         'paid_at',
@@ -33,11 +33,11 @@ class Payment extends Model
     // Scope status
     public function scopePending($query)
     {
-        return $query->where('payment_status', 'pending');
+        return $query->where('status', 'pending');
     }
 
     public function scopePaid($query)
     {
-        return $query->where('payment_status', 'paid');
+        return $query->where('status', 'paid');
     }
 }

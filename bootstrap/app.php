@@ -14,6 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
+
+        // Endpoint webhook Midtrans dikecualikan dari verifikasi CSRF karena
+        // request datang langsung dari server Midtrans, bukan dari browser.
+        $middleware->validateCsrfTokens(except: [
+            'payment/callback',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

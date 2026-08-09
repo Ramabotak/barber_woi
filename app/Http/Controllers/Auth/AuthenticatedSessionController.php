@@ -27,30 +27,14 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        // Validasi role (tambahan dari form login)
-        $request->validate([
-            'role' => ['required', 'in:customer,barber,admin'],
-        ]);
-
         // Autentikasi kredensial (email & password) lewat LoginRequest
         $request->authenticate();
 
         // Regenerasi session untuk keamanan
         $request->session()->regenerate();
 
-        // Ambil user yang sudah login
-        $user = Auth::user();
-
-        // Cek kesesuaian role yang dipilih dengan role user sebenarnya
-        if ($user->role !== $request->role) {
-            Auth::logout(); // logout dulu
-            throw ValidationException::withMessages([
-                'role' => 'Peran yang dipilih tidak sesuai dengan akun Anda.',
-            ]);
-        }
-
-        // Redirect sesuai role
-        return $this->redirectByRole($user);
+        // Redirect otomatis sesuai role yang tersimpan di database (tanpa perlu user memilih role)
+        return $this->redirectByRole(Auth::user());
     }
 
     /**

@@ -25,6 +25,18 @@
         </div>
     </div>
 
+    {{-- Grafik --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 lg:col-span-2">
+            <h2 class="text-lg font-semibold mb-4 text-brand-navy">Pendapatan 7 Hari Terakhir</h2>
+            <canvas id="revenueChart" height="110"></canvas>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold mb-4 text-brand-navy">Status Booking (30 Hari)</h2>
+            <canvas id="statusChart" height="110"></canvas>
+        </div>
+    </div>
+
     {{-- Booking Terbaru --}}
     <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
         <h2 class="text-lg font-semibold mb-4 text-brand-navy">Booking Terbaru</h2>
@@ -65,4 +77,62 @@
             </table>
         </div>
     </div>
+
+    @push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+    <script>
+        const revenueCtx = document.getElementById('revenueChart');
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: @json($revenueChartLabels),
+                datasets: [{
+                    label: 'Pendapatan (Rp)',
+                    data: @json($revenueChartData),
+                    borderColor: '#D4AF37',
+                    backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: '#D4AF37',
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => 'Rp ' + value.toLocaleString('id-ID')
+                        }
+                    }
+                }
+            }
+        });
+
+        const statusCtx = document.getElementById('statusChart');
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: @json($statusChartLabels),
+                datasets: [{
+                    data: @json($statusChartData),
+                    backgroundColor: [
+                        '#9CA3AF', // pending - abu
+                        '#60A5FA', // accepted - biru muda
+                        '#FBBF24', // waiting - kuning
+                        '#F87171', // late - merah muda
+                        '#3B82F6', // serving - biru
+                        '#22C55E', // completed - hijau
+                        '#EF4444', // cancelled - merah
+                    ],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
+            }
+        });
+    </script>
+    @endpush
 @endsection

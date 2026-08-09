@@ -27,6 +27,23 @@ class Booking extends Model
         'finished_at' => 'datetime',
     ];
 
+    // Alur status booking yang valid: pending -> accepted -> waiting/serving -> completed/cancelled.
+    // Dipakai untuk mencegah status "lompat" (mis. pending langsung ke completed).
+    public const STATUS_FLOW = [
+        'pending' => ['accepted', 'cancelled'],
+        'accepted' => ['waiting', 'cancelled'],
+        'waiting' => ['serving', 'late', 'cancelled'],
+        'late' => ['serving', 'cancelled'],
+        'serving' => ['completed', 'cancelled'],
+        'completed' => [],
+        'cancelled' => [],
+    ];
+
+    public function canTransitionTo(string $newStatus): bool
+    {
+        return in_array($newStatus, self::STATUS_FLOW[$this->status] ?? [], true);
+    }
+
     // Boot method untuk generate booking_code otomatis
     protected static function boot()
     {
@@ -110,5 +127,16 @@ class Booking extends Model
     public function scopeToday($query)
     {
         return $query->whereDate('created_at', today());
+    }
+
+    // Dipakai halaman "Booking Saya" (tab Aktif vs Riwayat)
+    public function scopeActive($query)
+    {
+        return $query->whereNotIn('status', ['completed', 'cancelled']);
+    }
+
+    public function scopeHistory($query)
+    {
+        return $query->whereIn('status', ['completed', 'cancelled']);
     }
 }

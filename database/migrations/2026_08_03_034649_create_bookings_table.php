@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
             $table->foreignId('schedule_id')->constrained('schedules')->onDelete('cascade');
             $table->integer('queue_number');
-            $table->enum('status', ['pending', 'confirmed', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'accepted', 'waiting', 'late', 'serving', 'completed', 'cancelled'])->default('pending');
             $table->timestamp('check_in_time')->nullable();
             $table->timestamp('finished_at')->nullable();
             $table->timestamps();

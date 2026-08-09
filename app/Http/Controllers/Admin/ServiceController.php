@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ServiceController extends Controller
 {
@@ -13,7 +14,7 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $services = Service::latest()->paginate(10);
+        $services = Service::latest()->paginate(12);
         return view('admin.services.index', compact('services'));
     }
 
@@ -32,11 +33,16 @@ class ServiceController extends Controller
     {
         $validated = $request->validate([
             'service_name' => 'required|string|max:100',
+            'photo'        => 'nullable|image|max:2048',
             'price'        => 'required|numeric|min:0',
             'duration'     => 'required|integer|min:1',
             'description'  => 'nullable|string',
             'status'       => 'required|in:active,inactive',
         ]);
+
+        if ($request->hasFile('photo')) {
+            $validated['photo'] = $request->file('photo')->store('services', 'public');
+        }
 
         Service::create($validated);
 
@@ -59,11 +65,20 @@ class ServiceController extends Controller
     {
         $validated = $request->validate([
             'service_name' => 'required|string|max:100',
+            'photo'        => 'nullable|image|max:2048',
             'price'        => 'required|numeric|min:0',
             'duration'     => 'required|integer|min:1',
             'description'  => 'nullable|string',
             'status'       => 'required|in:active,inactive',
         ]);
+
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama biar tidak menumpuk file yatim di storage
+            if ($service->photo) {
+                Storage::disk('public')->delete($service->photo);
+            }
+            $validated['photo'] = $request->file('photo')->store('services', 'public');
+        }
 
         $service->update($validated);
 
@@ -76,6 +91,10 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
+        if ($service->photo) {
+            Storage::disk('public')->delete($service->photo);
+        }
+
         $service->delete();
 
         return redirect()->route('admin.services.index')

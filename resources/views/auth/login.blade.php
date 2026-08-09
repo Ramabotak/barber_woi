@@ -66,18 +66,6 @@
                     @error('email')<p class="text-error text-body-sm">{{ $message }}</p>@enderror
                 </div>
 
-                {{-- Nomor Telepon --}}
-                <div class="flex flex-col gap-1">
-                    <label class="font-label-md text-label-md text-on-surface-variant" for="phone-mobile">Nomor Telepon</label>
-                    <div class="relative">
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">call</span>
-                        <input type="tel" name="phone" id="phone-mobile" value="{{ old('phone') }}" required
-                               class="w-full border border-outline-variant rounded-lg px-4 py-3 pl-10 font-body-md text-body-md bg-surface-bright focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface"
-                               placeholder="Masukkan nomor telepon">
-                    </div>
-                    @error('phone')<p class="text-error text-body-sm">{{ $message }}</p>@enderror
-                </div>
-
                 {{-- Password Mobile dengan Toggle --}}
                 <div class="flex flex-col gap-1">
                     <div class="flex justify-between items-center">
@@ -145,18 +133,6 @@
                                    placeholder="Masukkan email Anda">
                         </div>
                         @error('email')<p class="text-error text-body-sm">{{ $message }}</p>@enderror
-                    </div>
-
-                    {{-- Nomor Telepon Desktop --}}
-                    <div class="flex flex-col gap-1">
-                        <label class="font-label-md text-label-md text-on-surface" for="phone-desktop">Nomor Telepon</label>
-                        <div class="relative">
-                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">call</span>
-                            <input type="tel" name="phone" id="phone-desktop" value="{{ old('phone') }}" required
-                                   class="form-input w-full pl-10 pr-4 py-3 rounded-lg border border-outline-variant bg-surface text-on-surface font-body-md text-body-md"
-                                   placeholder="Masukkan nomor telepon Anda">
-                        </div>
-                        @error('phone')<p class="text-error text-body-sm">{{ $message }}</p>@enderror
                     </div>
 
                     {{-- Password Desktop dengan Toggle --}}
