@@ -34,6 +34,10 @@
                    class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors {{ request()->routeIs('barber.queue') ? 'bg-white/10 font-semibold' : '' }}">
                     Antrean Aktif
                 </a>
+                <a href="{{ route('barber.schedule.index') }}"
+                   class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors {{ request()->routeIs('barber.schedule.*') ? 'bg-white/10 font-semibold' : '' }}">
+                    Jadwal Saya
+                </a>
                 <a href="{{ route('notifications.index') }}"
                    class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors {{ request()->routeIs('notifications.*') ? 'bg-white/10 font-semibold' : '' }}">
                     Notifikasi

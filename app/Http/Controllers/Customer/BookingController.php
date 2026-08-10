@@ -53,10 +53,9 @@ class BookingController extends Controller
             scheduleId: $validated['schedule_id'],
         );
 
-        // Sementara alur pembayaran Midtrans dinonaktifkan (masih maintenance),
-        // jadi langsung arahkan ke halaman detail booking.
-        return redirect()->route('customer.booking.show', $booking)
-            ->with('success', "Booking {$booking->booking_code} berhasil dibuat. Menunggu konfirmasi barber.");
+        // Midtrans sudah aktif, arahkan ke halaman pembayaran Snap.
+        return redirect()->route('customer.payment.show', $booking)
+            ->with('success', "Booking {$booking->booking_code} berhasil dibuat. Silakan lanjutkan pembayaran.");
     }
 
     public function index(Request $request): View

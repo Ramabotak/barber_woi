@@ -57,9 +57,33 @@ class MidtransService
     {
         $notification = new MidtransNotification($payload);
 
-        $transactionStatus = $notification->transaction_status;
-        $fraudStatus = $notification->fraud_status ?? null;
+        return $this->normalizeStatus(
+            $notification->transaction_status,
+            $notification->fraud_status ?? null,
+            $notification->order_id,
+            $notification->payment_type ?? null
+        );
+    }
 
+    /**
+     * Cek status transaksi langsung ke API Midtrans (bukan dari webhook).
+     * Berguna sebagai fallback kalau webhook tidak sampai ke server kita,
+     * misalnya saat testing di localhost yang tidak bisa diakses Midtrans.
+     */
+    public function getStatus(string $orderId): array
+    {
+        $result = \Midtrans\Transaction::status($orderId);
+
+        return $this->normalizeStatus(
+            $result->transaction_status ?? null,
+            $result->fraud_status ?? null,
+            $result->order_id ?? $orderId,
+            $result->payment_type ?? null
+        );
+    }
+
+    protected function normalizeStatus(?string $transactionStatus, ?string $fraudStatus, ?string $orderId, ?string $paymentType): array
+    {
         $status = match (true) {
             $transactionStatus === 'capture' && $fraudStatus === 'challenge' => 'pending',
             $transactionStatus === 'capture' && $fraudStatus === 'accept' => 'paid',
@@ -72,9 +96,9 @@ class MidtransService
         };
 
         return [
-            'order_id' => $notification->order_id,
+            'order_id' => $orderId,
             'status' => $status,
-            'payment_type' => $notification->payment_type ?? null,
+            'payment_type' => $paymentType,
         ];
     }
 }

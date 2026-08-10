@@ -50,12 +50,19 @@
         </div>
     </div>
 
-    <div class="mt-6 flex gap-2">
+    <div class="mt-6 flex gap-2 flex-wrap">
         @if(!in_array($booking->status, ['completed', 'cancelled']))
             <form action="{{ route('admin.bookings.cancel', $booking) }}" method="POST">
                 @csrf @method('PATCH')
                 <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"
                         onclick="return confirm('Batalkan booking ini?')">Batalkan Booking</button>
+            </form>
+            <form action="{{ route('admin.bookings.force-complete', $booking) }}" method="POST">
+                @csrf @method('PATCH')
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+                        onclick="return confirm('Langsung tandai booking ini selesai? Aksi ini melewati urutan status normal (accepted/waiting/serving).')">
+                    Selesaikan Langsung
+                </button>
             </form>
         @endif
         @if($booking->status === 'cancelled' && $booking->payment && $booking->payment->status !== 'refunded')

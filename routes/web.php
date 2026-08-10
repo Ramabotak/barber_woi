@@ -92,6 +92,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::post('/booking/{booking}/review', [ReviewController::class, 'store'])->name('booking.review');
 
     Route::get('/payment/{booking}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment/{booking}/check', [PaymentController::class, 'checkStatus'])->name('payment.check');
 });
 
 /*
@@ -111,6 +112,9 @@ Route::middleware(['auth', 'role:barber'])->prefix('barber')->name('barber.')->g
     Route::patch('/booking/{booking}/finish', [BarberBookingController::class, 'finishService'])->name('booking.finish');
     Route::patch('/booking/{booking}/late', [BarberBookingController::class, 'markLate'])->name('booking.late');
 
+    Route::get('/schedule', [BarberScheduleController::class, 'index'])->name('schedule.index');
+    Route::post('/schedule', [BarberScheduleController::class, 'store'])->name('schedule.store');
+    Route::delete('/schedule/{schedule}', [BarberScheduleController::class, 'destroy'])->name('schedule.destroy');
     Route::patch('/schedule/{schedule}/close', [BarberScheduleController::class, 'closeShift'])->name('schedule.close');
 });
 
@@ -144,6 +148,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/bookings/{booking}', [AdminBookingController::class, 'show'])->name('bookings.show');
     Route::patch('/bookings/{booking}/cancel', [AdminBookingController::class, 'cancel'])->name('bookings.cancel');
     Route::patch('/bookings/{booking}/refund', [AdminBookingController::class, 'refund'])->name('bookings.refund');
+    Route::patch('/bookings/{booking}/force-complete', [AdminBookingController::class, 'forceComplete'])->name('bookings.force-complete');
 
     // Laporan
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

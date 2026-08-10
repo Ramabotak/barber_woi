@@ -60,4 +60,23 @@ class BookingController extends Controller
 
         return back()->with('success', "Refund untuk booking {$booking->booking_code} diproses.");
     }
+
+    // Jalan pintas admin: langsung tandai selesai dari status apa pun (kecuali
+    // yang sudah completed/cancelled), tanpa harus lewat urutan status normal.
+    // Berguna untuk kasus status nyangkut, misalnya webhook pembayaran belum
+    // sempat masuk saat testing.
+    public function forceComplete(Booking $booking): RedirectResponse
+    {
+        abort_if(in_array($booking->status, ['completed', 'cancelled'], true), 422, 'Booking ini sudah final.');
+
+        $booking->update([
+            'status' => 'completed',
+            'check_in_time' => $booking->check_in_time ?? now(),
+            'finished_at' => now(),
+        ]);
+
+        $this->notificationService->notifyStatusChanged($booking);
+
+        return back()->with('success', "Booking {$booking->booking_code} langsung ditandai selesai.");
+    }
 }

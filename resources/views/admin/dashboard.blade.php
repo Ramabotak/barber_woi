@@ -79,8 +79,8 @@
     </div>
 
     @push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
     <script>
+    document.addEventListener('DOMContentLoaded', function () {
         const revenueCtx = document.getElementById('revenueChart');
         new Chart(revenueCtx, {
             type: 'line',
@@ -133,6 +133,7 @@
                 plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
             }
         });
+    });
     </script>
     @endpush
 @endsection

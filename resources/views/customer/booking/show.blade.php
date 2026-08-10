@@ -11,6 +11,9 @@
     @if(session('success'))
         <div class="bg-green-50 text-green-700 p-3 rounded mb-4">{{ session('success') }}</div>
     @endif
+    @if(session('error'))
+        <div class="bg-red-50 text-red-700 p-3 rounded mb-4">{{ session('error') }}</div>
+    @endif
     @if($errors->any())
         <div class="bg-red-50 text-red-700 p-3 rounded mb-4">
             @foreach($errors->all() as $error)
@@ -44,10 +47,37 @@
         </dl>
     </div>
 
-    {{-- Info pembayaran (sementara nonaktif) --}}
+    {{-- Info Pembayaran --}}
     @if(!in_array($booking->status, ['completed', 'cancelled']))
-        <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-4 mb-4 text-sm">
-            💳 Pembayaran online sedang dalam pemeliharaan. Silakan lakukan pembayaran langsung di tempat saat kedatangan.
+        <div class="bg-white rounded-xl shadow p-4 mb-4">
+            @if($booking->payment && $booking->payment->status === 'paid')
+                <div class="flex items-center gap-2 text-green-700 text-sm">
+                    <span>✅</span>
+                    <span>Pembayaran berhasil {{ $booking->payment->paid_at?->diffForHumans() }}. Menunggu konfirmasi barber.</span>
+                </div>
+            @else
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                        <p class="text-sm font-medium">Belum dibayar</p>
+                        <p class="text-xs text-gray-400">Selesaikan pembayaran agar booking bisa diproses barber.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        @if($booking->payment)
+                            <form action="{{ route('customer.payment.check', $booking) }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                        class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200 whitespace-nowrap">
+                                    Cek Status
+                                </button>
+                            </form>
+                        @endif
+                        <a href="{{ route('customer.payment.show', $booking) }}"
+                           class="bg-brand-gold text-brand-navy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-400 whitespace-nowrap">
+                            Bayar Sekarang
+                        </a>
+                    </div>
+                </div>
+            @endif
         </div>
     @endif
 
