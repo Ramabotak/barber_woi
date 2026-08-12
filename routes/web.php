@@ -71,6 +71,7 @@ Route::middleware('auth')->group(function () {
 */
 Route::middleware('auth')->prefix('notifications')->name('notifications.')->group(function () {
     Route::get('/', [NotificationController::class, 'index'])->name('index');
+    Route::get('/latest', [NotificationController::class, 'latest'])->name('latest');
     Route::patch('{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
     Route::patch('read-all', [NotificationController::class, 'markAllAsRead'])->name('read-all');
 });
@@ -90,6 +91,11 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::get('/booking/{booking}', [CustomerBookingController::class, 'show'])->name('booking.show');
 
     Route::post('/booking/{booking}/review', [ReviewController::class, 'store'])->name('booking.review');
+    Route::put('/booking/{booking}/review', [ReviewController::class, 'update'])->name('booking.review.update');
+    Route::delete('/booking/{booking}/review', [ReviewController::class, 'destroy'])->name('booking.review.destroy');
+
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/booking/barber/{barber}/reviews', [ReviewController::class, 'barberReviews'])->name('booking.barber.reviews');
 
     Route::get('/payment/{booking}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{booking}/check', [PaymentController::class, 'checkStatus'])->name('payment.check');

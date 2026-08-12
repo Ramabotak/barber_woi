@@ -20,7 +20,10 @@ class BookingController extends Controller
 
     public function create(): View
     {
-        $barbers = Barber::active()->with('user')->get();
+        $barbers = Barber::active()->with('user')
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->get();
         $services = Service::active()->get();
 
         return view('customer.booking.create', compact('barbers', 'services'));

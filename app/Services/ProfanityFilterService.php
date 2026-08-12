@@ -12,16 +12,10 @@ class ProfanityFilterService
         'jancok', 'jancuk', 'asu', 'kampret', 'bego', 'pantek', 'pukimak',
         'keparat', 'biadab', 'kunyuk', 'pepek', 'peler', 'kimak', 'lonte',
         'pelacur', 'bangke', 'cok', 'diancuk', 'kntl', 'ngewe',
-        'jembut', 'silit', 'kadal', 'babi', 'setan',
+        'jembut', 'silit', 'kadal', 'babi', 'setan','anj', 'bodoh', 'bitch', 'fuck', 'shit', 'asshole', 'bastard', 'dick', 'pussy', 'slut',
     ];
 
-    /**
-     * Sensor kata kasar dalam teks: huruf pertama & terakhir dipertahankan,
-     * huruf di tengah diganti bintang. Contoh: "anjing" -> "a****g".
-     * Pencarian pakai word boundary agar tidak menyensor kata yang cuma
-     * mengandung substring kata terlarang (mis. "kelas" tidak kena walau
-     * ada kombinasi huruf mirip).
-     */
+    
     public function censor(?string $text): ?string
     {
         if (!$text) {

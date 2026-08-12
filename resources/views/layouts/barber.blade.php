@@ -39,8 +39,11 @@
                     Jadwal Saya
                 </a>
                 <a href="{{ route('notifications.index') }}"
-                   class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors {{ request()->routeIs('notifications.*') ? 'bg-white/10 font-semibold' : '' }}">
+                   class="relative block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors {{ request()->routeIs('notifications.*') ? 'bg-white/10 font-semibold' : '' }}" x-data>
                     Notifikasi
+                    <span x-show="$store.notif.unreadCount > 0" x-cloak
+                          x-text="$store.notif.unreadCount > 9 ? '9+' : $store.notif.unreadCount"
+                          class="ml-1 bg-red-500 text-white text-[10px] rounded-full px-1.5 py-0.5 align-top"></span>
                 </a>
             </nav>
             <div class="p-4 border-t border-white/10">
@@ -58,5 +61,9 @@
             @yield('content')
         </main>
     </div>
+
+    @include('partials.notification-toast')
+
+    @stack('scripts')
 </body>
 </html>

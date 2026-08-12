@@ -11,7 +11,10 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
-        $barbers = Barber::active()->with('user')->get();
+        $barbers = Barber::active()->with('user')
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->get();
         $services = Service::active()->get();
 
         return view('customer.dashboard', compact('barbers', 'services'));

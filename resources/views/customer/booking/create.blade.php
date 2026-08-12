@@ -35,6 +35,11 @@
                             @endif
                         </div>
                         <p class="text-sm font-medium">{{ $barber->user->name }}</p>
+                        @if($barber->reviews_count > 0)
+                            <p class="text-xs text-amber-500 mt-1">★ {{ number_format($barber->reviews_avg_rating, 1) }} <span class="text-gray-400">({{ $barber->reviews_count }})</span></p>
+                        @else
+                            <p class="text-xs text-gray-400 mt-1">Belum ada ulasan</p>
+                        @endif
                     </label>
                 @empty
                     <p class="col-span-full text-gray-400 text-sm">Tidak ada barber tersedia.</p>
