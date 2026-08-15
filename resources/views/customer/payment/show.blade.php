@@ -35,7 +35,7 @@
         </button>
 
         <p class="text-xs text-gray-400 text-center mt-3">
-            Pembayaran diproses aman lewat Midtrans. Setelah pembayaran berhasil, booking Anda akan otomatis dikonfirmasi.
+            Pembayaran diproses aman lewat Midtrans. Setelah pembayaran berhasil, booking Anda masuk daftar Booking Masuk barber dan menunggu konfirmasi barber.
         </p>
 
         <div id="pay-error" class="hidden bg-red-50 text-red-700 p-3 rounded mt-4 text-sm"></div>

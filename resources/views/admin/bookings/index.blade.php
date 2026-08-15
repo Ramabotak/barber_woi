@@ -15,7 +15,7 @@
             <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
             <select name="status" class="border rounded-lg px-3 py-2 text-sm">
                 <option value="">Semua Status</option>
-                @foreach(['pending', 'accepted', 'waiting', 'late', 'serving', 'completed', 'cancelled'] as $status)
+                @foreach(['pending', 'paid', 'accepted', 'waiting', 'late', 'serving', 'completed', 'cancelled'] as $status)
                     <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
                 @endforeach
             </select>
@@ -59,6 +59,7 @@
                                 @if($booking->status == 'completed') bg-green-100 text-green-700
                                 @elseif($booking->status == 'cancelled') bg-red-100 text-red-700
                                 @elseif($booking->status == 'serving') bg-blue-100 text-blue-700
+                                @elseif($booking->status == 'paid') bg-emerald-100 text-emerald-700
                                 @else bg-amber-100 text-amber-800 @endif">
                                 {{ $booking->status }}
                             </span>

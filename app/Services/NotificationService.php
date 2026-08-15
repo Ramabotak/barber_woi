@@ -33,6 +33,15 @@ class NotificationService
             "Booking {$booking->booking_code} telah diterima. Nomor antrean Anda: {$booking->queue_number}.");
     }
 
+    public function notifyBookingPaid(Booking $booking): void
+    {
+        $this->send($booking->customer_id, $booking->id, 'Pembayaran Berhasil',
+            "Pembayaran booking {$booking->booking_code} berhasil. Menunggu konfirmasi barber.");
+
+        $this->send($booking->barber->user_id, $booking->id, 'Booking Dibayar',
+            "Ada booking {$booking->booking_code} yang sudah dibayar, menunggu konfirmasi Anda.");
+    }
+
     public function notifyBookingRejected(Booking $booking): void
     {
         $this->send($booking->customer_id, $booking->id, 'Booking Ditolak',

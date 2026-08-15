@@ -101,8 +101,11 @@ class PaymentController extends Controller
 
         $booking = $payment->booking;
         if ($result['status'] === 'paid' && $booking->status === 'pending') {
-            $booking->update(['status' => 'accepted']);
-            $this->notificationService->notifyBookingAccepted($booking);
+            // Pembayaran sukses, booking jadi 'paid' (menunggu konfirmasi barber
+            // di halaman Booking Masuk). Barber yang menerima (Terima) yang
+            // mengubahnya jadi 'accepted' agar masuk antrean.
+            $booking->update(['status' => 'paid']);
+            $this->notificationService->notifyBookingPaid($booking);
         }
 
         return true;

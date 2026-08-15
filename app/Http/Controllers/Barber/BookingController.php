@@ -29,9 +29,12 @@ class BookingController extends Controller
         $barber = $request->user()->barber;
         abort_unless($barber, 403);
 
-        $bookings = Booking::with(['customer', 'service', 'schedule'])
-            ->where('barber_id', $barber->id)->where('status', 'pending')
-            ->orderBy('created_at')->get();
+        $bookings = Booking::with(['customer', 'service', 'schedule', 'payment'])
+            ->where('barber_id', $barber->id)
+            ->whereIn('status', ['pending', 'paid'])
+            ->orderByRaw("FIELD(status, 'paid', 'pending')")
+            ->orderBy('created_at')
+            ->get();
 
         return view('barber.booking.incoming', compact('bookings'));
     }
@@ -61,7 +64,7 @@ class BookingController extends Controller
 
         $bookings = Booking::with(['customer', 'service', 'schedule'])
             ->where('barber_id', $barber->id)
-            ->whereIn('status', ['accepted', 'waiting', 'late'])
+            ->whereIn('status', ['accepted', 'waiting', 'late', 'serving'])
             ->orderBy('queue_number')->get();
 
         return view('barber.booking.queue', compact('bookings'));

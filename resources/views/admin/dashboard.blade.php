@@ -63,6 +63,7 @@
                                     @if($booking->status == 'completed') bg-green-100 text-green-700
                                     @elseif($booking->status == 'cancelled') bg-red-100 text-red-700
                                     @elseif($booking->status == 'serving') bg-blue-100 text-blue-700
+                                    @elseif($booking->status == 'paid') bg-emerald-100 text-emerald-700
                                     @else bg-amber-100 text-amber-800 @endif">
                                     {{ $booking->status }}
                                 </span>
@@ -119,6 +120,7 @@
                     data: @json($statusChartData),
                     backgroundColor: [
                         '#9CA3AF', // pending - abu
+                        '#34D399', // paid - hijau muda (sudah dibayar)
                         '#60A5FA', // accepted - biru muda
                         '#FBBF24', // waiting - kuning
                         '#F87171', // late - merah muda

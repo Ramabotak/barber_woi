@@ -37,7 +37,7 @@ class DashboardController extends Controller
             ->groupBy('status')
             ->pluck('total', 'status');
 
-        $statusLabels = ['pending', 'accepted', 'waiting', 'late', 'serving', 'completed', 'cancelled'];
+        $statusLabels = ['pending', 'paid', 'accepted', 'waiting', 'late', 'serving', 'completed', 'cancelled'];
         $statusChartLabels = array_map('ucfirst', $statusLabels);
         $statusChartData = array_map(fn ($status) => (int) ($statusCounts[$status] ?? 0), $statusLabels);
 

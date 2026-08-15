@@ -24,7 +24,14 @@
             <tbody>
                 @forelse($bookings as $booking)
                     <tr class="border-b hover:bg-gray-50">
-                        <td class="p-3">{{ $booking->booking_code }}</td>
+                        <td class="p-3">
+                            {{ $booking->booking_code }}
+                            @if($booking->status === 'paid')
+                                <span class="ml-2 inline-block px-2 py-0.5 text-[10px] rounded-full bg-emerald-100 text-emerald-700 font-semibold">Sudah Dibayar</span>
+                            @else
+                                <span class="ml-2 inline-block px-2 py-0.5 text-[10px] rounded-full bg-gray-100 text-gray-500 font-semibold">Belum Dibayar</span>
+                            @endif
+                        </td>
                         <td class="p-3">
                             {{ $booking->customer->name }}
                             <div class="text-xs text-gray-400">{{ $booking->customer->phone_number ?? '-' }}</div>

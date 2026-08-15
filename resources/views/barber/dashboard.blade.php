@@ -12,7 +12,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-            <p class="text-sm text-gray-500">Booking Masuk (Pending)</p>
+            <p class="text-sm text-gray-500">Booking Masuk (Menunggu)</p>
             <p class="text-3xl font-bold text-brand-navy">{{ $pendingBookings->count() }}</p>
         </div>
         <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
@@ -36,7 +36,11 @@
             @forelse($pendingBookings->take(5) as $booking)
                 <div class="flex items-center justify-between py-3 border-b last:border-0">
                     <div>
-                        <p class="font-medium text-sm">{{ $booking->customer->name }}</p>
+                        <p class="font-medium text-sm">{{ $booking->customer->name }}
+                            @if($booking->status === 'paid')
+                                <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold align-middle">Dibayar</span>
+                            @endif
+                        </p>
                         <p class="text-xs text-gray-500">{{ $booking->service->service_name }} &middot; {{ $booking->booking_code }}</p>
                     </div>
                     <div class="flex gap-2">

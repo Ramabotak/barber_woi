@@ -24,7 +24,7 @@
                     Booking Masuk
                     @php $barberId = auth()->user()->barber?->id; @endphp
                     @if($barberId)
-                        @php $incomingCount = \App\Models\Booking::where('barber_id', $barberId)->where('status', 'pending')->count(); @endphp
+                        @php $incomingCount = \App\Models\Booking::where('barber_id', $barberId)->whereIn('status', ['pending', 'paid'])->count(); @endphp
                         @if($incomingCount > 0)
                             <span class="ml-1 bg-brand-gold text-brand-navy text-xs font-bold px-2 py-0.5 rounded-full">{{ $incomingCount }}</span>
                         @endif

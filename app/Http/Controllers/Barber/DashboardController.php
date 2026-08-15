@@ -16,8 +16,11 @@ class DashboardController extends Controller
         abort_unless($barber, 403, 'Akun Anda belum terhubung dengan data barber.');
 
         $pendingBookings = Booking::with(['customer', 'service', 'schedule'])
-            ->where('barber_id', $barber->id)->where('status', 'pending')
-            ->orderBy('created_at')->get();
+            ->where('barber_id', $barber->id)
+            ->whereIn('status', ['pending', 'paid'])
+            ->orderByRaw("FIELD(status, 'paid', 'pending')")
+            ->orderBy('created_at')
+            ->get();
 
         $servingBookings = Booking::with(['customer', 'service', 'schedule'])
             ->where('barber_id', $barber->id)->where('status', 'serving')->get();

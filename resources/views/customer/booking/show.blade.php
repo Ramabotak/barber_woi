@@ -33,6 +33,7 @@
                 @elseif($booking->status == 'cancelled') bg-red-100 text-red-700
                 @elseif($booking->status == 'serving') bg-blue-100 text-blue-700
                 @elseif($booking->status == 'late') bg-red-50 text-red-600
+                @elseif($booking->status == 'paid') bg-emerald-100 text-emerald-700
                 @else bg-amber-100 text-amber-800 @endif">
                 {{ ucfirst($booking->status) }}
             </span>
