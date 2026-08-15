@@ -53,7 +53,7 @@
                         <td class="p-3">{{ $booking->customer->name ?? '-' }}</td>
                         <td class="p-3">{{ $booking->barber->user->name ?? '-' }}</td>
                         <td class="p-3">{{ $booking->service->service_name ?? '-' }}</td>
-                        <td class="p-3">{{ $booking->schedule?->date?->format('d M Y') }}</td>
+                        <td class="p-3">{{ $booking->schedule?->date?->format('d M Y') }}{{ $booking->slot_time ? ', ' . $booking->slot_time->format('H:i') : '' }}</td>
                         <td class="p-3">
                             <span class="px-2 py-1 text-xs rounded-full
                                 @if($booking->status == 'completed') bg-green-100 text-green-700

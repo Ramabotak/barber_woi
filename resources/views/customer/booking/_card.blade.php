@@ -7,7 +7,7 @@
                 {{ $booking->barber->user->name }} &middot; {{ $booking->booking_code }}
             </p>
             <p class="text-xs text-gray-400 mt-1">
-                {{ $booking->schedule?->date?->format('d M Y') }}, {{ \Carbon\Carbon::parse($booking->schedule->start_time)->format('H:i') }}
+                {{ $booking->schedule?->date?->format('d M Y') }}{{ $booking->slot_time ? ', ' . $booking->slot_time->format('H:i') : '' }}
                 &middot; No. Antrean {{ $booking->queue_number }}
             </p>
         </div>

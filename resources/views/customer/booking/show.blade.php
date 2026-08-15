@@ -42,7 +42,7 @@
             <div class="flex justify-between"><dt class="text-gray-500">Barber</dt><dd>{{ $booking->barber->user->name }}</dd></div>
             <div class="flex justify-between"><dt class="text-gray-500">Layanan</dt><dd>{{ $booking->service->service_name }}</dd></div>
             <div class="flex justify-between"><dt class="text-gray-500">Harga</dt><dd>Rp {{ number_format($booking->service->price, 0, ',', '.') }}</dd></div>
-            <div class="flex justify-between"><dt class="text-gray-500">Jadwal</dt><dd>{{ $booking->schedule?->date?->format('d M Y') }}, {{ \Carbon\Carbon::parse($booking->schedule->start_time)->format('H:i') }}</dd></div>
+            <div class="flex justify-between"><dt class="text-gray-500">Jadwal</dt><dd>{{ $booking->schedule?->date?->format('d M Y') }}{{ $booking->slot_time ? ', ' . $booking->slot_time->format('H:i') : '' }}</dd></div>
             <div class="flex justify-between"><dt class="text-gray-500">No. Antrean</dt><dd>#{{ $booking->queue_number }}</dd></div>
         </dl>
     </div>

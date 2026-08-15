@@ -20,7 +20,7 @@
             <dl class="space-y-2 text-sm mb-4">
                 <div class="flex justify-between"><dt class="text-gray-500">Barber</dt><dd>{{ $booking->barber->user->name }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">Layanan</dt><dd>{{ $booking->service->service_name }}</dd></div>
-                <div class="flex justify-between"><dt class="text-gray-500">Jadwal</dt><dd>{{ $booking->schedule?->date?->format('d M Y') }}, {{ \Carbon\Carbon::parse($booking->schedule->start_time)->format('H:i') }}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">Jadwal</dt><dd>{{ $booking->schedule?->date?->format('d M Y') }}{{ $booking->slot_time ? ', ' . $booking->slot_time->format('H:i') : '' }}</dd></div>
             </dl>
 
             <div class="flex justify-between items-center pt-4 border-t">

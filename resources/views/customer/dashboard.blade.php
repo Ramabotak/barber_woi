@@ -38,6 +38,11 @@
                     @else
                         <p class="text-xs text-gray-400">Belum ada ulasan</p>
                     @endif
+                    @if($barber->schedules->isNotEmpty())
+                        <p class="text-[10px] text-green-600 mt-1 leading-tight">
+                            Jadwal: {{ $barber->schedules->take(3)->map(fn($s) => \Illuminate\Support\Carbon::parse($s->date)->locale('id')->translatedFormat('D, d M'))->implode(' · ') }}
+                        </p>
+                    @endif
                 </div>
             </div>
         @empty

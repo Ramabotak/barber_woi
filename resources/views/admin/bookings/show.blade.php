@@ -20,7 +20,7 @@
                 <div class="flex justify-between"><dt class="text-gray-500">Customer</dt><dd>{{ $booking->customer->name }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">Barber</dt><dd>{{ $booking->barber->user->name }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">Layanan</dt><dd>{{ $booking->service->service_name }}</dd></div>
-                <div class="flex justify-between"><dt class="text-gray-500">Jadwal</dt><dd>{{ $booking->schedule?->date?->format('d M Y') }}, {{ $booking->schedule?->start_time }}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">Jadwal</dt><dd>{{ $booking->schedule?->date?->format('d M Y') }}{{ $booking->slot_time ? ', ' . $booking->slot_time->format('H:i') : '' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">No. Antrean</dt><dd>{{ $booking->queue_number }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">Status</dt><dd class="font-semibold">{{ $booking->status }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">Check-in</dt><dd>{{ $booking->check_in_time?->format('d M Y H:i') ?? '-' }}</dd></div>

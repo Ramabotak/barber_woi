@@ -16,6 +16,7 @@ class Booking extends Model
         'barber_id',
         'service_id',
         'schedule_id',
+        'slot_time',
         'queue_number',
         'status',
         'check_in_time',
@@ -23,6 +24,7 @@ class Booking extends Model
     ];
 
     protected $casts = [
+        'slot_time' => 'datetime',
         'check_in_time' => 'datetime',
         'finished_at' => 'datetime',
     ];

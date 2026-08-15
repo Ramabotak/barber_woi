@@ -21,6 +21,12 @@ class BookingController extends Controller
     public function create(): View
     {
         $barbers = Barber::active()->with('user')
+            ->with(['schedules' => fn ($q) => $q
+                ->where('date', '>=', now()->toDateString())
+                ->where('status', 'tersedia')
+                ->orderBy('date')
+                ->orderBy('start_time'),
+            ])
             ->withAvg('reviews', 'rating')
             ->withCount('reviews')
             ->get();
@@ -38,7 +44,12 @@ class BookingController extends Controller
             ->orderBy('date')->orderBy('start_time')
             ->get(['id', 'date', 'start_time', 'end_time']);
 
-        return response()->json($schedules);
+        return response()->json($schedules->map(fn (Schedule $schedule) => [
+            'id' => $schedule->id,
+            'date' => $schedule->date->format('Y-m-d'),
+            'date_label' => $schedule->date->locale('id')->translatedFormat('l, d M Y'),
+            'slots' => $this->bookingService->slots($schedule),
+        ]));
     }
 
     public function store(Request $request): RedirectResponse
@@ -47,6 +58,7 @@ class BookingController extends Controller
             'barber_id' => ['required', 'exists:barbers,id'],
             'service_id' => ['required', 'exists:services,id'],
             'schedule_id' => ['required', 'exists:schedules,id'],
+            'slot_time' => ['required', 'date_format:H:i'],
         ]);
 
         $booking = $this->bookingService->createBooking(
@@ -54,6 +66,7 @@ class BookingController extends Controller
             barberId: $validated['barber_id'],
             serviceId: $validated['service_id'],
             scheduleId: $validated['schedule_id'],
+            slotTime: $validated['slot_time'],
         );
 
         // Midtrans sudah aktif, arahkan ke halaman pembayaran Snap.

@@ -32,7 +32,7 @@
                         <td class="p-3">{{ $booking->service->service_name }}</td>
                         <td class="p-3">
                             {{ $booking->schedule?->date?->format('d M Y') }}
-                            <div class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($booking->schedule->start_time)->format('H:i') }}</div>
+                            <div class="text-xs text-gray-400">{{ $booking->slot_time?->format('H:i') ?? \Carbon\Carbon::parse($booking->schedule->start_time)->format('H:i') }}</div>
                         </td>
                         <td class="p-3">{{ $booking->created_at->diffForHumans() }}</td>
                         <td class="p-3 space-x-2 whitespace-nowrap">
