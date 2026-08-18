@@ -5,296 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barber Woi - Selamat Datang</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        .slide-track {
-            transition: transform 0.5s ease-in-out;
+        .glass-panel {
+            background: rgba(28, 28, 30, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(201, 162, 75, 0.15);
         }
-        .brand-shadow {
-            box-shadow: 0px 4px 20px rgba(26, 54, 93, 0.08);
+        .text-shadow-gold {
+            text-shadow: 0 4px 24px rgba(201, 162, 75, 0.4);
         }
-        /* Mobile slider scroll */
-        .slide-container {
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .slide-container::-webkit-scrollbar {
-            display: none;
-        }
-        .slide-mobile {
-            scroll-snap-align: start;
-        }
-        .dot {
-            transition: all 0.3s ease;
+        .bg-overlay {
+            background: linear-gradient(180deg, rgba(28, 28, 30, 0.3) 0%, rgba(28, 28, 30, 0.8) 50%, rgba(28, 28, 30, 1) 100%);
         }
     </style>
 </head>
-<body class="bg-surface-bright text-on-background font-sans antialiased h-screen w-screen overflow-hidden">
+<body class="bg-charcoal m-0 p-0 min-h-screen flex items-center justify-center font-body text-white antialiased overflow-hidden">
 
-    {{-- Splash Screen Awal --}}
-    <div id="splash-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-primary transition-opacity duration-700">
-        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7Nura0KkuJucNw0OuenfKq8H28FXi1sBkts348ya91kKKUSJBsOCkRz63YmLU6yo4DZBg5PmyfNsmsReXneO_ukN5PAO3TT46ugpzPBOTHQxVNa9_wxHcXr-hGY7UzADg4iSa11W5pcNtiTefLCwSe2fq88d3slHtiQKW07dc3pOiDv46-fsA0QhjVwW51e8HooTnqw4IDGIezl5O50s2KvAiYk246Xpzw4G1RuKNlvsrOTLGHJkU"
-             alt="Barber Woi Logo" class="w-48 h-48 rounded-full shadow-lg object-cover mb-4">
-        <h1 class="font-display-lg text-display-lg text-on-primary">Barber Woi</h1>
-        <p class="font-body-lg text-body-lg text-primary-fixed-dim mt-2">Premium Grooming Experience</p>
+    {{-- Background image + overlay --}}
+    <div class="fixed inset-0 z-0 w-full h-full bg-cover bg-center"
+         style="background-image: url('https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1600&auto=format&fit=crop');">
     </div>
+    <div class="fixed inset-0 z-10 w-full h-full bg-overlay"></div>
 
-    {{-- Main Content --}}
-    <div id="main-content" class="h-full w-full opacity-0 transition-opacity duration-700">
+    {{-- Main content --}}
+    <main class="relative z-20 w-full max-w-[420px] min-h-screen md:min-h-[800px] flex flex-col justify-between px-5 py-10 md:py-12 mx-auto md:glass-panel md:rounded-xl md:shadow-2xl">
 
-        {{-- MOBILE VERSION (visible on small screens) --}}
-        <div class="md:hidden h-full flex flex-col">
-            <!-- Header Skip -->
-            <header class="flex justify-end p-margin-mobile absolute top-0 left-0 right-0 z-10">
-                <button id="skip-btn-mobile" class="text-on-surface-variant font-body-sm hover:text-brand-gold transition-colors py-2 px-4 rounded-full bg-surface-container-low/80 backdrop-blur-sm">
-                    Lewati
-                </button>
-            </header>
+        <div class="flex-1"></div>
 
-            <!-- Slider Container -->
-            <div id="slider-mobile" class="slide-container flex-grow flex overflow-x-auto w-full h-full">
-                <!-- Slide 1 -->
-                <div class="slide-mobile flex-none w-full h-full flex flex-col items-center justify-center p-margin-mobile">
-                    <div class="w-full max-w-sm aspect-square mb-stack-lg rounded-2xl shadow-sm border border-outline-variant/30 overflow-hidden">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfrGCEqAhno07DAH8oWJPVCZHeIpWNMWbrYkHbtyXdeXqKLje3jFvfVeLS7OJp5sE5SAQoK7KmH5zItAlkxPz9Mfmp9QpTzb8sp481BEnc3NzOau2vt6iV5P3DCTpYF8MyU3tgwpnW8qfwoWyBAeIOuCoaewMDbR3A5omp8fMoBOWcPz5oDrCtwzktpd8FoKH9TW4OD8cjKVgoAzvvy2ijHcinhDnF_MuKanAT42-UPwmv6NqtZT6a"
-                             alt="Booking Mudah" class="w-full h-full object-cover">
-                    </div>
-                    <div class="text-center max-w-xs mt-auto mb-stack-lg">
-                        <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-brand-navy mb-stack-sm">Booking Mudah</h2>
-                        <p class="font-body-md text-body-md text-on-surface-variant">Jadwalkan potong rambut Anda hanya dengan beberapa ketukan. Pilih layanan, barber favorit, dan waktu yang sesuai.</p>
-                    </div>
-                </div>
-                <!-- Slide 2 -->
-                <div class="slide-mobile flex-none w-full h-full flex flex-col items-center justify-center p-margin-mobile">
-                    <div class="w-full max-w-sm aspect-square mb-stack-lg rounded-2xl shadow-sm border border-outline-variant/30 overflow-hidden">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH7ALku1h0_vzoUQ_roqjEQCqT_ZcA7IxfswRNwYlWr-EeyPco-AqjwqtVs8mcqNGXjhUVazEl6Iz2NGyeMDQAcRcaIyAzcnXaMhdWFv8wsTkaWUgSgCk4WvXeKS-PFfEUnROGX0MPqasT0NYiRF9z4D_MUem4oMShILxixTWGct89iUz7EeArCnKbym4KhydZ0R0-EwZJwAKA8zHv7VLATmhMnxjkTiCifQ0wcNOuiCyfcHMi8ilk"
-                             alt="Antrean Real-Time" class="w-full h-full object-cover">
-                    </div>
-                    <div class="text-center max-w-xs mt-auto mb-stack-lg">
-                        <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-brand-navy mb-stack-sm">Antrean Real-Time</h2>
-                        <p class="font-body-md text-body-md text-on-surface-variant">Tidak perlu lagi menunggu lama. Pantau status antrean Anda secara langsung dan datang tepat waktu.</p>
-                    </div>
-                </div>
-                <!-- Slide 3 -->
-                <div class="slide-mobile flex-none w-full h-full flex flex-col items-center justify-center p-margin-mobile">
-                    <div class="w-full max-w-sm aspect-square mb-stack-lg rounded-2xl shadow-sm border border-outline-variant/30 overflow-hidden">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNCmaSCVe-kNcaoPv5gC622eFJddL-Maz1Ohaa8zCTCWwB6lW31DQNRqn1flNWpJDhmmXuW_ELe0f2A6iRoBBd_agBV2O5I44bTg2t_rI1eT3Yx0sEJRGX3Nrw5rbQZGIpebUR2OQoOH0MPxTH1Adfz4s_H8adrdFBb4nWmurgAt67gZdZGBJ7dRNinszzWr2TF_iJHs5tzTYWua-YiJLhovspAjzs9H8G0poZIFQR7XEwKYGZedkS"
-                             alt="Pembayaran Online" class="w-full h-full object-cover">
-                    </div>
-                    <div class="text-center max-w-xs mt-auto mb-stack-lg">
-                        <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-brand-navy mb-stack-sm">Pembayaran Online</h2>
-                        <p class="font-body-md text-body-md text-on-surface-variant">Transaksi aman dan praktis. Nikmati kemudahan pembayaran tanpa uang tunai langsung dari aplikasi.</p>
-                    </div>
-                </div>
+        {{-- Logo & tagline --}}
+        <div class="flex-1 flex flex-col items-center justify-center space-y-4" id="logo-container">
+            <div class="w-16 h-16 rounded-full border border-gold flex items-center justify-center mb-2">
+                <span class="material-symbols-outlined text-gold text-3xl" style="font-variation-settings: 'FILL' 1;">content_cut</span>
             </div>
-
-            <!-- Bottom Controls -->
-            <div class="w-full px-margin-mobile pb-stack-lg pt-stack-sm flex flex-col items-center gap-stack-md shrink-0 bg-surface">
-                <div class="flex space-x-2" id="dots-mobile">
-                    <div class="dot h-2 w-6 rounded-full bg-brand-gold" data-index="0"></div>
-                    <div class="dot h-2 w-2 rounded-full bg-outline-variant" data-index="1"></div>
-                    <div class="dot h-2 w-2 rounded-full bg-outline-variant" data-index="2"></div>
-                </div>
-                <button id="action-btn-mobile" class="w-full max-w-xs bg-brand-gold text-brand-navy font-headline-sm text-headline-sm py-4 rounded-xl brand-shadow hover:brightness-110 transition-all flex items-center justify-center gap-2">
-                    <span>SELANJUTNYA</span>
-                    <span class="material-symbols-outlined">arrow_forward</span>
-                </button>
-            </div>
+            <h1 class="font-heading text-4xl md:text-6xl font-bold text-gold text-shadow-gold tracking-tight uppercase">
+                Barber WOI
+            </h1>
+            <p class="font-body text-cream/80 text-center max-w-[280px]">
+                Premium grooming experience, kini bisa dibooking dari mana saja.
+            </p>
         </div>
 
-        {{-- DESKTOP VERSION (visible on md and up) --}}
-        <div class="hidden md:block h-full w-full">
-            <main class="relative w-full h-full bg-surface overflow-hidden">
-                {{-- Background Image Fullscreen --}}
-                <div class="absolute inset-0 z-0"
-                     style="background-image: url('https://lh3.googleusercontent.com/aida/AP1WRLsomBgzFWg_25Nen7gKYB70Osr2tj384pP6CUd3hjQrUG8oaSD5vAabcV-kMOolV2etl7WHbSp4VgC6_E5mEcwThrZWA73m5tRIjhA4YVE3pKh_PfrSryIxFyXHKQ0Qq2mg13NxmTunZ73b_sdNesYp1I_pkr8mcbVdrr1CAifFTUrnbh34-ygrtgRBsxq0QVvPT85hkry8kUnDcAMxW3EmPfPD0uecMbdeX_5TPxY55cozP4-u7PPU5A');
-                      background-size: cover;
-                      background-position: center;">
-                    <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-primary/20 backdrop-blur-[1px]"></div>
-                </div>
+        {{-- Aksi login --}}
+        <div class="flex-1 flex flex-col justify-end w-full space-y-3 pb-8 md:pb-0" id="action-container">
 
-                {{-- Konten di atas background --}}
-                <section class="relative z-10 w-full h-full flex flex-col justify-center px-margin-mobile md:px-margin-desktop py-stack-lg">
-                    {{-- Header: Logo + Skip --}}
-                    <header class="mb-stack-lg shrink-0 flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-4xl text-on-primary">content_cut</span>
-                            <h1 class="font-headline-md text-headline-md font-bold tracking-tight text-on-primary">Barber Woi</h1>
-                        </div>
-                        <button id="skip-btn-desktop" class="text-on-primary/80 font-body-sm hover:text-brand-gold transition-colors">
-                            Lewati
-                        </button>
-                    </header>
+            {{-- Masuk dengan Google --}}
+            <a href="{{ route('google.login') }}"
+               class="w-full h-14 bg-white text-charcoal rounded-lg flex items-center justify-center space-x-3 px-6 hover:bg-gray-50 active:scale-95 transition-all duration-200 shadow-sm">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                </svg>
+                <span class="font-medium text-sm">Masuk dengan Google</span>
+            </a>
 
-                    {{-- Slider Area --}}
-                    <div class="flex-1 flex flex-col justify-center max-w-md w-full overflow-hidden">
-                        {{-- Slides --}}
-                        <div class="flex slide-track w-full" id="slider-desktop">
-                            <article class="w-full flex-none shrink-0 pr-4">
-                                <h2 class="font-display-lg text-display-lg text-on-primary mb-stack-md">Booking Mudah.</h2>
-                                <p class="font-body-lg text-body-lg text-primary-fixed-dim leading-relaxed">
-                                    Jadwalkan potong rambut Anda hanya dengan beberapa ketukan. Pilih layanan, barber favorit, dan waktu yang sesuai.
-                                </p>
-                            </article>
-                            <article class="w-full flex-none shrink-0 pr-4">
-                                <h2 class="font-display-lg text-display-lg text-on-primary mb-stack-md">Antrean Real-Time.</h2>
-                                <p class="font-body-lg text-body-lg text-primary-fixed-dim leading-relaxed">
-                                    Tidak perlu lagi menunggu lama. Pantau status antrean Anda secara langsung dan datang tepat waktu.
-                                </p>
-                            </article>
-                            <article class="w-full flex-none shrink-0 pr-4">
-                                <h2 class="font-display-lg text-display-lg text-on-primary mb-stack-md">Pembayaran Online.</h2>
-                                <p class="font-body-lg text-body-lg text-primary-fixed-dim leading-relaxed">
-                                    Transaksi aman dan praktis. Nikmati kemudahan pembayaran tanpa uang tunai langsung dari aplikasi.
-                                </p>
-                            </article>
-                        </div>
+            {{-- Masuk dengan Email --}}
+            <a href="{{ route('login') }}"
+               class="w-full h-14 bg-transparent text-gold rounded-lg flex items-center justify-center space-x-3 px-6 hover:bg-white/5 active:scale-95 transition-all duration-200 border-2 border-gold">
+                <span class="material-symbols-outlined text-[20px]">mail</span>
+                <span class="font-medium text-sm">Masuk dengan Email</span>
+            </a>
 
-                        {{-- Dots --}}
-                        <div class="flex items-center gap-2 mt-stack-lg mb-stack-md" id="dots-desktop">
-                            <button class="dot h-2 w-6 rounded-full bg-brand-gold transition-all" data-index="0"></button>
-                            <button class="dot h-2 w-2 rounded-full bg-outline-variant transition-all" data-index="1"></button>
-                            <button class="dot h-2 w-2 rounded-full bg-outline-variant transition-all" data-index="2"></button>
-                        </div>
-
-                        {{-- CTA Button --}}
-                        <button id="action-btn-desktop"
-                                class="w-full py-4 px-6 bg-brand-gold text-brand-navy font-headline-sm text-headline-sm rounded-xl brand-shadow hover:brightness-110 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                            <span>Selanjutnya</span>
-                            <span class="material-symbols-outlined">arrow_forward</span>
-                        </button>
-
-                        {{-- Link Masuk --}}
-                        <div class="flex items-center justify-center gap-2 mt-stack-md">
-                            <span class="font-body-sm text-body-sm text-primary-fixed-dim">Sudah punya akun?</span>
-                            <a href="{{ route('login') }}" class="font-headline-sm text-headline-sm text-brand-gold hover:text-secondary-fixed transition-colors">Masuk</a>
-                        </div>
-                    </div>
-                </section>
-            </main>
+            <div class="mt-6 text-center">
+                <p class="text-xs text-cream/60">
+                    Dengan masuk, Anda menyetujui
+                    <a href="{{ Route::has('terms') ? route('terms') : '#' }}" class="text-gold hover:underline">Syarat &amp; Ketentuan</a> kami.
+                </p>
+            </div>
         </div>
-
-    </div>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Splash screen
-            const splashScreen = document.getElementById('splash-screen');
-            const mainContent = document.getElementById('main-content');
+            const logo = document.getElementById('logo-container');
+            const actions = document.getElementById('action-container');
+
+            logo.style.opacity = '0';
+            logo.style.transform = 'translateY(20px)';
+            actions.style.opacity = '0';
+            actions.style.transform = 'translateY(20px)';
+            logo.style.transition = 'opacity 0.7s, transform 0.7s';
+            actions.style.transition = 'opacity 0.7s, transform 0.7s';
 
             setTimeout(() => {
-                splashScreen.classList.add('opacity-0');
-                setTimeout(() => {
-                    splashScreen.classList.add('hidden');
-                    mainContent.classList.remove('opacity-0');
-                }, 700);
-            }, 2000);
+                logo.style.opacity = '1';
+                logo.style.transform = 'translateY(0)';
+            }, 100);
 
-            // Mobile elements
-            const sliderMobile = document.getElementById('slider-mobile');
-            const dotsMobile = document.querySelectorAll('#dots-mobile .dot');
-            const actionBtnMobile = document.getElementById('action-btn-mobile');
-            const skipBtnMobile = document.getElementById('skip-btn-mobile');
-            const btnTextMobile = actionBtnMobile?.querySelector('span:first-child');
-
-            // Desktop elements
-            const sliderDesktop = document.getElementById('slider-desktop');
-            const dotsDesktop = document.querySelectorAll('#dots-desktop .dot');
-            const actionBtnDesktop = document.getElementById('action-btn-desktop');
-            const skipBtnDesktop = document.getElementById('skip-btn-desktop');
-            const btnTextDesktop = actionBtnDesktop?.querySelector('span:first-child');
-
-            let currentSlideMobile = 0;
-            let currentSlideDesktop = 0;
-            const totalSlides = 3;
-
-            // --- Mobile Slider Logic ---
-            if (sliderMobile) {
-                const updateMobile = (index) => {
-                    currentSlideMobile = index;
-                    dotsMobile.forEach((dot, i) => {
-                        if (i === index) {
-                            dot.classList.replace('bg-outline-variant', 'bg-brand-gold');
-                            dot.classList.replace('w-2', 'w-6');
-                        } else {
-                            dot.classList.replace('bg-brand-gold', 'bg-outline-variant');
-                            dot.classList.replace('w-6', 'w-2');
-                        }
-                    });
-                    if (btnTextMobile) {
-                        btnTextMobile.textContent = index === totalSlides - 1 ? 'MULAI SEKARANG' : 'SELANJUTNYA';
-                    }
-                };
-
-                sliderMobile.addEventListener('scroll', () => {
-                    const scrollLeft = sliderMobile.scrollLeft;
-                    const slideWidth = sliderMobile.clientWidth;
-                    const newIndex = Math.round(scrollLeft / slideWidth);
-                    if (newIndex !== currentSlideMobile) {
-                        updateMobile(newIndex);
-                    }
-                });
-
-                actionBtnMobile.addEventListener('click', () => {
-                    if (currentSlideMobile < totalSlides - 1) {
-                        sliderMobile.scrollTo({ left: (currentSlideMobile + 1) * sliderMobile.clientWidth, behavior: 'smooth' });
-                    } else {
-                        window.location.href = '{{ route("login") }}';
-                    }
-                });
-
-                skipBtnMobile.addEventListener('click', () => window.location.href = '{{ route("login") }}');
-
-                dotsMobile.forEach((dot, i) => {
-                    dot.addEventListener('click', () => {
-                        sliderMobile.scrollTo({ left: i * sliderMobile.clientWidth, behavior: 'smooth' });
-                    });
-                    dot.style.cursor = 'pointer';
-                });
-            }
-
-            // --- Desktop Slider Logic ---
-            if (sliderDesktop) {
-                const updateDesktop = (index) => {
-                    currentSlideDesktop = index;
-                    sliderDesktop.style.transform = `translateX(-${index * 100}%)`;
-                    dotsDesktop.forEach((dot, i) => {
-                        if (i === index) {
-                            dot.classList.replace('bg-outline-variant', 'bg-brand-gold');
-                            dot.classList.replace('w-2', 'w-6');
-                        } else {
-                            dot.classList.replace('bg-brand-gold', 'bg-outline-variant');
-                            dot.classList.replace('w-6', 'w-2');
-                        }
-                    });
-                    if (btnTextDesktop) {
-                        btnTextDesktop.textContent = index === totalSlides - 1 ? 'Mulai Sekarang' : 'Selanjutnya';
-                    }
-                };
-
-                actionBtnDesktop.addEventListener('click', () => {
-                    if (currentSlideDesktop < totalSlides - 1) {
-                        updateDesktop(currentSlideDesktop + 1);
-                    } else {
-                        window.location.href = '{{ route("login") }}';
-                    }
-                });
-
-                skipBtnDesktop.addEventListener('click', () => window.location.href = '{{ route("login") }}');
-
-                dotsDesktop.forEach((dot, i) => {
-                    dot.addEventListener('click', () => {
-                        updateDesktop(i);
-                    });
-                    dot.style.cursor = 'pointer';
-                });
-            }
+            setTimeout(() => {
+                actions.style.opacity = '1';
+                actions.style.transform = 'translateY(0)';
+            }, 400);
         });
     </script>
 </body>
