@@ -25,6 +25,14 @@ class BookingController extends Controller
         if ($request->filled('date')) {
             $query->whereHas('schedule', fn ($q) => $q->whereDate('date', $request->input('date')));
         }
+        // Pencarian berdasarkan kode booking atau nama customer (dipakai search bar di topbar)
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('booking_code', 'like', "%{$search}%")
+                  ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%{$search}%"));
+            });
+        }
 
         $bookings = $query->orderByDesc('created_at')->paginate(20)->withQueryString();
 

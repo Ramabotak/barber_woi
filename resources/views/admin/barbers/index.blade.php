@@ -1,70 +1,92 @@
 @extends('layouts.admin')
 
-@section('title', 'Daftar Barber - Barber Woi')
+@section('title', 'Kelola Barber - Barber Woi')
 
 @section('content')
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Daftar Barber</h1>
-        <a href="{{ route('admin.barbers.create') }}" 
-           class="bg-brand-gold text-brand-navy px-4 py-2 rounded-lg font-semibold hover:bg-amber-400">
-            + Tambah Barber
+
+    {{-- Page Header --}}
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h2 class="font-heading text-2xl md:text-3xl font-bold text-charcoal">Kelola Barber</h2>
+            <p class="text-gray-500 mt-1">Lihat, tambah, dan kelola tim barber profesional Anda</p>
+        </div>
+        <a href="{{ route('admin.barbers.create') }}"
+           class="bg-gold hover:bg-gold/90 text-charcoal font-bold py-3 px-5 rounded-lg shadow-sm transition-all active:scale-95 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">add</span>
+            Tambah Barber
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="bg-green-50 text-green-700 p-3 rounded mb-4">{{ session('success') }}</div>
+    @if (session('success'))
+        <div class="bg-brandsuccess/10 border border-brandsuccess text-brandsuccess p-3 rounded-lg mb-6 text-sm">
+            {{ session('success') }}
+        </div>
     @endif
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-        @forelse($barbers as $barber)
-            <div class="bg-white rounded-xl shadow overflow-hidden flex flex-col">
-                <div class="h-40 bg-gray-100 flex items-center justify-center">
-                    @if($barber->photo)
-                        <img src="{{ Storage::url($barber->photo) }}" alt="{{ $barber->user->name }}"
-                             class="w-full h-full object-cover">
+    {{-- Barber Grid --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        @forelse ($barbers as $barber)
+            @php
+                $statusMap = [
+                    'aktif'    => ['label' => 'Aktif',     'badge' => 'bg-gold text-charcoal',        'dot' => 'bg-charcoal', 'fade' => ''],
+                    'libur'    => ['label' => 'Libur',     'badge' => 'bg-brandwarning text-white',   'dot' => 'bg-white',    'fade' => 'opacity-90'],
+                    'cuti'     => ['label' => 'Cuti',      'badge' => 'bg-branddanger text-white',    'dot' => 'bg-white',    'fade' => 'opacity-80 grayscale-[30%]'],
+                    'nonaktif' => ['label' => 'Nonaktif',  'badge' => 'bg-gray-200 text-gray-600 border border-gray-300', 'dot' => 'bg-gray-500', 'fade' => 'opacity-60 grayscale'],
+                ];
+                $s = $statusMap[$barber->status] ?? $statusMap['nonaktif'];
+            @endphp
+
+            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative flex flex-col h-full {{ $s['fade'] }}">
+
+                <div class="absolute top-2 right-2 z-10 {{ $s['badge'] }} text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1 shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full {{ $s['dot'] }}"></span>
+                    {{ $s['label'] }}
+                </div>
+
+                <div class="h-48 w-full bg-gray-100 relative overflow-hidden">
+                    @if ($barber->photo)
+                        <img src="{{ Storage::url($barber->photo) }}" alt="{{ $barber->user->name }}" class="w-full h-full object-cover">
                     @else
-                        <div class="w-20 h-20 rounded-full bg-brand-navy text-white flex items-center justify-center text-2xl font-bold">
-                            {{ strtoupper(substr($barber->user->name, 0, 1)) }}
+                        <div class="w-full h-full flex items-center justify-center bg-charcoal">
+                            <span class="text-gold text-3xl font-bold">{{ strtoupper(substr($barber->user->name, 0, 1)) }}</span>
                         </div>
                     @endif
                 </div>
-                <div class="p-4 flex-1 flex flex-col">
-                    <div class="flex items-start justify-between gap-2 mb-1">
-                        <h3 class="font-semibold text-brand-navy">{{ $barber->user->name }}</h3>
-                        <span class="shrink-0 px-2 py-1 text-xs rounded-full
-                            @if($barber->status == 'aktif') bg-green-100 text-green-700
-                            @elseif($barber->status == 'libur') bg-yellow-100 text-yellow-700
-                            @elseif($barber->status == 'cuti') bg-blue-100 text-blue-700
-                            @else bg-gray-100 text-gray-700 @endif">
-                            {{ ucfirst($barber->status) }}
-                        </span>
-                    </div>
-                    <p class="text-xs text-gray-500">{{ $barber->user->email }}</p>
-                    <p class="text-xs text-gray-500 mb-3">{{ $barber->user->phone_number ?? '-' }}</p>
-                    @if($barber->experience)
-                        <p class="text-sm text-gray-600 line-clamp-2 mb-3">{{ $barber->experience }}</p>
-                    @endif
 
-                    <div class="mt-auto flex gap-2 pt-2 border-t">
-                        <a href="{{ route('admin.barbers.edit', $barber) }}" 
-                           class="flex-1 text-center text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg">
-                            Edit
-                        </a>
-                        <form action="{{ route('admin.barbers.destroy', $barber) }}" method="POST" class="flex-1">
-                            @csrf @method('DELETE')
-                            <button type="submit" 
-                                    class="w-full text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg"
-                                    onclick="return confirm('Hapus barber ini? Akun login-nya juga akan terhapus.')">
-                                Hapus
-                            </button>
-                        </form>
+                <div class="p-4 flex-1 flex flex-col">
+                    <h3 class="font-heading text-lg font-semibold text-charcoal mb-1">{{ $barber->user->name }}</h3>
+                    <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ $barber->experience ? Str::limit($barber->experience, 40) : 'Belum ada keterangan spesialisasi' }}</p>
+
+                    <div class="flex items-center gap-2 mt-auto text-gray-600 bg-gray-50 px-2 py-1 rounded-md w-fit mb-3">
+                        <span class="material-symbols-outlined text-[16px]">workspace_premium</span>
+                        <span class="text-xs">{{ $barber->experience ? Str::before($barber->experience, ' ') : '-' }} Pengalaman</span>
                     </div>
+                </div>
+
+                <div class="border-t border-gray-200 px-4 py-2 flex justify-between bg-gray-50/50">
+                    <a href="{{ route('admin.barbers.edit', $barber) }}"
+                       class="flex items-center gap-1 text-gray-600 hover:text-charcoal transition-colors py-1 text-sm">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                        Edit
+                    </a>
+                    <div class="w-px bg-gray-200 mx-1"></div>
+                    <form action="{{ route('admin.barbers.destroy', $barber) }}" method="POST"
+                          onsubmit="return confirm('Hapus barber ini? Akun login-nya juga akan terhapus.')">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="flex items-center gap-1 text-branddanger hover:text-branddanger/80 transition-colors py-1 text-sm">
+                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                            Hapus
+                        </button>
+                    </form>
                 </div>
             </div>
         @empty
-            <div class="col-span-full py-12 text-center text-gray-500">Belum ada barber.</div>
+            <div class="col-span-full py-16 text-center text-gray-500">
+                Belum ada barber. Klik "Tambah Barber" untuk menambahkan.
+            </div>
         @endforelse
     </div>
 
-    <div class="mt-6">{{ $barbers->links() }}</div>
+    <div class="mt-8">{{ $barbers->links() }}</div>
+
 @endsection

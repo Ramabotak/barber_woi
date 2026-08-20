@@ -15,7 +15,13 @@ class ServiceController extends Controller
     public function index()
     {
         $services = Service::latest()->paginate(12);
-        return view('admin.services.index', compact('services'));
+
+        // Data untuk 3 kartu statistik di atas grid layanan
+        $activeCount   = Service::where('status', 'active')->count();
+        $inactiveCount = Service::where('status', 'inactive')->count();
+        $avgPrice      = Service::avg('price') ?? 0;
+
+        return view('admin.services.index', compact('services', 'activeCount', 'inactiveCount', 'avgPrice'));
     }
 
     /**
