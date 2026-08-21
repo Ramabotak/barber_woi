@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\BarberController as AdminBarberController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ExpenseController;
+use App\Http\Controllers\Admin\PayrollController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
@@ -156,8 +158,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('/bookings/{booking}/refund', [AdminBookingController::class, 'refund'])->name('bookings.refund');
     Route::patch('/bookings/{booking}/force-complete', [AdminBookingController::class, 'forceComplete'])->name('bookings.force-complete');
 
-    // Laporan
+    // Laporan keuangan, pengeluaran, dan payroll barber
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
+    Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+    Route::patch('/expenses/{expense}/approve', [ExpenseController::class, 'approve'])->name('expenses.approve');
+    Route::patch('/expenses/{expense}/reject', [ExpenseController::class, 'reject'])->name('expenses.reject');
+
+    Route::get('/payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
+    Route::put('/payrolls/settings/{barber}', [PayrollController::class, 'updateSetting'])->name('payrolls.settings.update');
+    Route::post('/payrolls/calculate', [PayrollController::class, 'calculate'])->name('payrolls.calculate');
+    Route::patch('/payrolls/{payroll}', [PayrollController::class, 'update'])->name('payrolls.update');
+    Route::patch('/payrolls/{payroll}/pay', [PayrollController::class, 'pay'])->name('payrolls.pay');
 
     // Ulasan Customer
     Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');

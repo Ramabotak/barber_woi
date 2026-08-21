@@ -34,6 +34,16 @@ class Barber extends Model
         return $this->hasMany(Booking::class);
     }
 
+    public function compensationSetting()
+    {
+        return $this->hasOne(BarberCompensationSetting::class);
+    }
+
+    public function payrolls()
+    {
+        return $this->hasMany(Payroll::class);
+    }
+
     // Semua ulasan yang masuk lewat booking milik barber ini.
     public function reviews()
     {
