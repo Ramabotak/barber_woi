@@ -3,69 +3,43 @@
 @section('title', 'Antrean Aktif - Barber Woi')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-6">Antrean Aktif</h1>
+    @php
+        $servingCount = $bookings->where('status', 'serving')->count();
+        $waitingCount = $bookings->whereIn('status', ['accepted', 'waiting'])->count();
+    @endphp
+    <div class="mx-auto max-w-[1200px]">
+        <header class="mb-6"><h1 class="font-['Plus_Jakarta_Sans'] text-[28px] font-semibold tracking-tight text-[#1a1c1c]">Antrean Aktif</h1><p class="mt-1 text-sm text-[#46464a]">Manajemen antrean pelanggan hari ini.</p></header>
+        @if(session('success')) <div class="mb-5 rounded border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">{{ session('success') }}</div> @endif
+        @if(session('error') || $errors->any()) <div class="mb-5 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ session('error') }} @foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div> @endif
 
-    @if(session('success'))
-        <div class="bg-green-50 text-green-700 p-3 rounded mb-4">{{ session('success') }}</div>
-    @endif
-    @if(session('error'))
-        <div class="bg-red-50 text-red-700 p-3 rounded mb-4">{{ session('error') }}</div>
-    @endif
-
-    @if($errors->any())
-        <div class="bg-red-50 text-red-700 p-3 rounded mb-4">
-            @foreach($errors->all() as $error)
-                <p>{{ $error }}</p>
-            @endforeach
+        <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div class="flex items-center justify-between rounded-lg border border-[#c7c6ca] bg-white p-4 shadow-sm"><div><p class="text-xs font-medium uppercase tracking-wide text-[#46464a]">Total Antrean</p><p class="font-['Plus_Jakarta_Sans'] text-2xl font-semibold">{{ $bookings->count() }}</p></div><span class="text-3xl text-[#77767b]">♧</span></div>
+            <div class="flex items-center justify-between rounded-lg border border-[#c7c6ca] bg-white p-4 shadow-sm"><div><p class="text-xs font-medium uppercase tracking-wide text-[#46464a]">Sedang Dilayani</p><p class="font-['Plus_Jakarta_Sans'] text-2xl font-semibold text-[#795902]">{{ $servingCount }}</p></div><span class="text-3xl text-[#795902]">✂</span></div>
+            <div class="flex items-center justify-between rounded-lg border border-[#c7c6ca] bg-white p-4 shadow-sm"><div><p class="text-xs font-medium uppercase tracking-wide text-[#46464a]">Menunggu</p><p class="font-['Plus_Jakarta_Sans'] text-2xl font-semibold text-[#d97706]">{{ $waitingCount }}</p></div><span class="text-3xl text-[#d97706]">⌛</span></div>
         </div>
-    @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        @forelse($bookings as $booking)
-            <div class="bg-white rounded-lg shadow p-5">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-2xl font-bold text-brand-navy">#{{ $booking->queue_number }}</span>
-                    <span class="text-xs px-2 py-1 rounded-full
-                        @if($booking->status == 'serving') bg-blue-100 text-blue-700
-                        @elseif($booking->status == 'late') bg-red-100 text-red-700
-                        @elseif($booking->status == 'waiting') bg-amber-100 text-amber-800
-                        @else bg-gray-100 text-gray-700 @endif">
-                        {{ ucfirst($booking->status) }}
-                    </span>
-                </div>
-                <p class="font-medium">{{ $booking->customer->name }}</p>
-                <p class="text-sm text-gray-500 mb-4">{{ $booking->service->service_name }} &middot; {{ $booking->booking_code }}</p>
-
-                <div class="flex gap-2 flex-wrap">
-                    @if($booking->status === 'accepted')
-                        <form action="{{ route('barber.booking.start', $booking) }}" method="POST">
-                            @csrf @method('PATCH')
-                            <button type="submit" class="bg-brand-navy text-white text-xs px-3 py-1.5 rounded-lg">Mulai Layanan</button>
-                        </form>
-                    @elseif($booking->status === 'waiting')
-                        <form action="{{ route('barber.booking.start', $booking) }}" method="POST">
-                            @csrf @method('PATCH')
-                            <button type="submit" class="bg-brand-navy text-white text-xs px-3 py-1.5 rounded-lg">Mulai Layanan</button>
-                        </form>
-                        <form action="{{ route('barber.booking.late', $booking) }}" method="POST">
-                            @csrf @method('PATCH')
-                            <button type="submit" class="bg-red-100 text-red-700 text-xs px-3 py-1.5 rounded-lg">Tandai Telat</button>
-                        </form>
-                    @elseif($booking->status === 'late')
-                        <form action="{{ route('barber.booking.start', $booking) }}" method="POST">
-                            @csrf @method('PATCH')
-                            <button type="submit" class="bg-brand-navy text-white text-xs px-3 py-1.5 rounded-lg">Mulai Layanan</button>
-                        </form>
-                    @elseif($booking->status === 'serving')
-                        <form action="{{ route('barber.booking.finish', $booking) }}" method="POST">
-                            @csrf @method('PATCH')
-                            <button type="submit" class="bg-green-600 text-white text-xs px-3 py-1.5 rounded-lg">Selesai</button>
-                        </form>
-                    @endif
-                </div>
-            </div>
-        @empty
-            <p class="text-gray-400 text-sm col-span-full py-6 text-center">Tidak ada antrean aktif saat ini.</p>
-        @endforelse
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            @forelse($bookings as $booking)
+                @php
+                    $accent = match($booking->status) { 'serving' => '#2563eb', 'late' => '#dc2626', default => '#d97706' };
+                    $label = match($booking->status) { 'serving' => 'Serving', 'late' => 'Late', default => 'Waiting' };
+                    $isServing = $booking->status === 'serving';
+                    $isLate = $booking->status === 'late';
+                @endphp
+                <article class="overflow-hidden rounded-lg border border-[#c7c6ca] border-l-4 bg-white p-4 shadow-sm" style="border-left-color: {{ $accent }}">
+                    <div class="mb-4 flex items-start justify-between"><div class="flex items-center gap-4"><div class="grid h-14 w-14 place-items-center rounded-lg bg-[#e2e2e2] font-['Plus_Jakarta_Sans'] text-2xl font-bold text-[#1a1c1c]">{{ $booking->queue_number }}</div><div><h2 class="font-['Plus_Jakarta_Sans'] text-lg font-semibold">{{ $booking->customer->name }}</h2><p class="text-sm text-[#46464a]">{{ $booking->customer->phone_number ?? 'Tidak ada nomor telepon' }}</p></div></div><span class="rounded-full border px-2 py-1 text-xs font-semibold" style="background-color: {{ $accent }}1A; color: {{ $accent }}; border-color: {{ $accent }}33">{{ $label }}</span></div>
+                    <div class="mb-4 rounded-lg border border-[#c7c6ca] bg-[#f9f9f9] p-3"><div class="flex items-center justify-between"><span class="text-sm font-semibold text-[#1a1c1c]">{{ $booking->service->service_name }}</span><span class="text-sm text-[#46464a]">{{ $booking->service->duration ?? '-' }} min</span></div></div>
+                    <div class="flex items-center justify-between border-t border-[#c7c6ca] pt-3"><p @class(['flex items-center gap-1 text-xs', 'text-red-600' => $isLate, 'text-[#46464a]' => !$isLate])>@if($isLate) ⚠ Terlambat @else ◷ {{ $isServing ? 'Mulai' : 'Est.' }}: {{ $booking->check_in_time?->format('H:i') ?? $booking->slot_time?->format('H:i') ?? '-' }} WIB @endif</p><div class="flex gap-2">
+                        @if($isServing)<form action="{{ route('barber.booking.finish', $booking) }}" method="POST">@csrf @method('PATCH')<button class="rounded-lg bg-[#fdd275] px-4 py-2 text-sm font-semibold text-[#775800] hover:bg-[#ffdf9e]">Selesaikan</button></form>
+                        @elseif(in_array($booking->status, ['accepted', 'waiting', 'late']))
+                            @if($booking->status === 'waiting')<form action="{{ route('barber.booking.late', $booking) }}" method="POST">@csrf @method('PATCH')<button class="rounded-lg border border-[#c7c6ca] px-3 py-2 text-sm text-[#1a1c1c] hover:bg-[#e2e2e2]">Tandai Telat</button></form>@endif
+                            <form action="{{ route('barber.booking.start', $booking) }}" method="POST">@csrf @method('PATCH')<button class="rounded-lg bg-[#1c1c1e] px-4 py-2 text-sm font-semibold text-white hover:bg-black">Mulai Layanan</button></form>
+                        @endif
+                    </div></div>
+                </article>
+            @empty
+                <div class="col-span-full rounded-lg border border-dashed border-gray-300 bg-white py-14 text-center text-sm text-gray-400">Tidak ada antrean aktif saat ini.</div>
+            @endforelse
+        </div>
     </div>
 @endsection

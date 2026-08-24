@@ -41,12 +41,40 @@
 
     {{-- Charts --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div class="bg-white border border-gray-200 rounded-xl p-6 lg:col-span-2">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-heading text-base font-semibold text-charcoal">Pendapatan 7 Hari Terakhir</h3>
+        <div class="bg-white border border-gray-200 rounded-xl p-6 lg:col-span-2 shadow-[0_1px_2px_rgba(28,28,30,0.03)]">
+            <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h3 class="font-heading text-lg font-semibold tracking-tight text-charcoal">Ringkasan Pendapatan</h3>
+                    <p class="mt-1 text-xs text-muted">Pendapatan harian untuk {{ \Carbon\Carbon::create($selectedYear, $selectedMonth)->translatedFormat('F Y') }}</p>
+                </div>
+                <form method="GET" action="{{ route('admin.dashboard') }}" class="inline-flex w-fit items-center gap-1 rounded-lg border border-gray-200 bg-gray-50/70 p-1">
+                    <label for="revenue-month" class="sr-only">Bulan pendapatan</label>
+                    <select id="revenue-month" name="month" onchange="this.form.submit()" class="rounded-md border-0 bg-transparent py-1.5 pl-2 pr-7 text-xs font-semibold text-charcoal focus:ring-0">
+                        @foreach(range(1, 12) as $month)
+                            <option value="{{ $month }}" @selected($selectedMonth === $month)>{{ \Carbon\Carbon::create()->month($month)->translatedFormat('F') }}</option>
+                        @endforeach
+                    </select>
+                    <span class="h-5 w-px bg-gray-200"></span>
+                    <label for="revenue-year" class="sr-only">Tahun pendapatan</label>
+                    <select id="revenue-year" name="year" onchange="this.form.submit()" class="rounded-md border-0 bg-transparent py-1.5 pl-2 pr-7 text-xs font-semibold text-charcoal focus:ring-0">
+                        @foreach($availableYears as $year)
+                            <option value="{{ $year }}" @selected($selectedYear === $year)>{{ $year }}</option>
+                        @endforeach
+                    </select>
+                    <noscript><button type="submit" class="rounded-md bg-charcoal px-3 py-1.5 text-xs font-medium text-white">Tampilkan</button></noscript>
+                </form>
             </div>
-            <div class="h-64 w-full">
+            <div class="relative h-72 w-full">
                 <canvas id="revenueChart"></canvas>
+                @unless($hasRevenueData)
+                    <div class="pointer-events-none absolute inset-0 flex items-center justify-center pb-8">
+                        <div class="rounded-lg border border-gold/20 bg-white/90 px-4 py-3 text-center shadow-sm">
+                            <span class="material-symbols-outlined block text-gold/70">payments</span>
+                            <p class="mt-1 text-xs font-semibold text-charcoal">Belum ada pendapatan</p>
+                            <p class="mt-0.5 text-[11px] text-muted">Data akan muncul setelah pembayaran berhasil.</p>
+                        </div>
+                    </div>
+                @endunless
             </div>
         </div>
 
@@ -107,8 +135,13 @@
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const revenueCtx = document.getElementById('revenueChart');
-        let gradient = revenueCtx.getContext('2d').createLinearGradient(0, 0, 0, 260);
-        gradient.addColorStop(0, 'rgba(201, 162, 75, 0.25)');
+        const formatRupiah = (amount) => 'Rp ' + Number(amount).toLocaleString('id-ID', {
+            maximumFractionDigits: 0,
+        });
+        const chartContext = revenueCtx.getContext('2d');
+        const gradient = chartContext.createLinearGradient(0, 0, 0, 288);
+        gradient.addColorStop(0, 'rgba(201, 162, 75, 0.28)');
+        gradient.addColorStop(0.65, 'rgba(201, 162, 75, 0.08)');
         gradient.addColorStop(1, 'rgba(201, 162, 75, 0)');
 
         new Chart(revenueCtx, {
@@ -120,12 +153,13 @@
                     data: @json($revenueChartData),
                     borderColor: '#1C1C1E',
                     backgroundColor: gradient,
-                    borderWidth: 2,
+                    borderWidth: 2.5,
                     pointBackgroundColor: '#C9A24B',
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
-                    pointRadius: 4,
+                    pointRadius: (context) => context.raw > 0 ? 3.5 : 0,
                     pointHoverRadius: 6,
+                    pointHitRadius: 16,
                     tension: 0.4,
                     fill: true,
                 }]
@@ -139,28 +173,43 @@
                         backgroundColor: '#1C1C1E',
                         titleFont: { family: 'Inter', size: 12 },
                         bodyFont: { family: 'Plus Jakarta Sans', size: 13, weight: 'bold' },
-                        padding: 10,
+                        padding: 12,
+                        cornerRadius: 6,
                         displayColors: false,
                         callbacks: {
-                            label: (context) => 'Rp ' + context.parsed.y.toLocaleString('id-ID')
+                            label: (context) => formatRupiah(context.parsed.y)
                         }
                     }
                 },
                 scales: {
                     x: {
-                        grid: { display: false },
-                        ticks: { font: { family: 'Inter', size: 11 }, color: '#8A8A8E' }
+                        grid: { display: false, drawBorder: false },
+                        border: { display: false },
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 8,
+                            maxRotation: 0,
+                            font: { family: 'Inter', size: 11 },
+                            color: '#8A8A8E',
+                            padding: 10,
+                        }
                     },
                     y: {
                         beginAtZero: true,
-                        grid: { color: '#eee', borderDash: [4, 4] },
+                        max: @json($hasRevenueData) ? undefined : 100000,
+                        border: { display: false },
+                        grid: { color: '#ECECEC', drawBorder: false },
                         ticks: {
                             font: { family: 'Inter', size: 11 },
                             color: '#8A8A8E',
-                            callback: (value) => 'Rp ' + value.toLocaleString('id-ID')
+                            stepSize: @json($hasRevenueData) ? undefined : 20000,
+                            callback: (value) => formatRupiah(value),
+                            padding: 8,
                         }
                     }
-                }
+                },
+                interaction: { intersect: false, mode: 'index' },
+                layout: { padding: { top: 4, right: 6 } },
             }
         });
 
