@@ -9,8 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#f9f9f9] font-['Inter'] antialiased text-[#1a1c1c]">
-    <div class="flex h-screen overflow-hidden">
+<body class="bg-[#f9f9f9] font-['Inter'] antialiased text-[#1a1c1c]" x-data="{ mobileMenu: false }">
+    <div class="flex min-h-screen md:h-screen md:overflow-hidden">
         <aside class="hidden w-64 shrink-0 flex-col border-r border-[#c7c6ca] bg-[#1c1c1e] p-6 text-white md:flex">
             <div class="mb-6 flex items-center gap-2">
                 <div class="grid h-10 w-10 place-items-center rounded-full bg-[#eeeeee] text-base text-[#1b1b1d]">✂</div>
@@ -27,9 +27,11 @@
             <form method="POST" action="{{ route('logout') }}" class="pt-4">@csrf<button type="submit" class="w-full rounded-lg px-4 py-2 text-left text-sm text-[#c8c6c8] transition-colors hover:bg-red-500/20">← Keluar</button></form>
         </aside>
 
+        <div x-show="mobileMenu" x-cloak @click.self="mobileMenu = false" class="fixed inset-0 z-50 bg-black/45 p-4 md:hidden"><aside x-show="mobileMenu" x-transition class="ml-auto flex h-full w-full max-w-xs flex-col rounded-xl bg-[#1c1c1e] p-5 text-white shadow-xl"><div class="flex items-center justify-between border-b border-white/10 pb-4"><div><h2 class="font-['Plus_Jakarta_Sans'] font-bold">Barber Woi</h2><p class="text-xs text-[#c8c6c8]">Staff Portal</p></div><button @click="mobileMenu=false" class="p-2"><span class="material-symbols-outlined">close</span></button></div><nav class="flex-1 space-y-1 py-4 text-sm"><a href="{{ route('barber.dashboard') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10">Dashboard</a><a href="{{ route('barber.booking.incoming') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10">Booking Masuk</a><a href="{{ route('barber.queue') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10">Antrean Aktif</a><a href="{{ route('barber.schedule.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10">Jadwal Saya</a><a href="{{ route('notifications.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10">Notifikasi</a></nav><form method="POST" action="{{ route('logout') }}">@csrf<button class="w-full rounded-lg bg-red-500/15 px-3 py-3 text-left text-sm text-red-200">Keluar</button></form></aside></div>
+
         <main class="flex min-w-0 flex-1 flex-col overflow-hidden">
-            <header class="hidden h-16 items-center justify-between border-b border-[#c7c6ca] bg-[#f9f9f9] px-6 md:flex"><p class="font-['Plus_Jakarta_Sans'] text-sm font-semibold italic text-[#010102]">Executive Grooming Standard</p><div class="flex items-center gap-4"><button class="text-[#46464a] hover:text-[#795902]">⌕</button><a href="{{ route('notifications.index') }}" class="relative text-[#46464a] hover:text-[#795902]">♧<span class="absolute -right-1 -top-0.5 h-1.5 w-1.5 rounded-full bg-red-600"></span></a><div class="grid h-8 w-8 place-items-center rounded-full border border-[#c7c6ca] bg-[#e2e2e2] text-xs font-bold text-[#46464a]">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div></div></header>
-            <section class="flex-1 overflow-y-auto bg-[#f9f9f9] p-6">@yield('content')</section>
+            <header class="flex h-16 items-center justify-between border-b border-[#c7c6ca] bg-[#f9f9f9] px-4 sm:px-6"><div class="flex items-center gap-2"><button @click="mobileMenu=true" class="p-2 md:hidden"><span class="material-symbols-outlined">menu</span></button><p class="font-['Plus_Jakarta_Sans'] text-sm font-semibold italic text-[#010102]">Executive Grooming Standard</p></div><div class="flex items-center gap-3"><a href="{{ route('notifications.index') }}" class="text-[#46464a] hover:text-[#795902]"><span class="material-symbols-outlined">notifications</span></a><div class="grid h-8 w-8 place-items-center rounded-full border border-[#c7c6ca] bg-[#e2e2e2] text-xs font-bold text-[#46464a]">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div></div></header>
+            <section class="flex-1 overflow-y-auto bg-[#f9f9f9] p-4 sm:p-6">@yield('content')</section>
         </main>
     </div>
     @include('partials.notification-toast')

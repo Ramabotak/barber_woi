@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Barber;
+use App\Models\Booking;
 use App\Models\Service;
 use Illuminate\View\View;
 
@@ -23,6 +24,13 @@ class DashboardController extends Controller
             ->get();
         $services = Service::active()->get();
 
-        return view('customer.dashboard', compact('barbers', 'services'));
+        $activeBooking = Booking::query()
+            ->where('customer_id', auth()->id())
+            ->active()
+            ->with(['barber.user', 'service', 'schedule', 'payment'])
+            ->latest()
+            ->first();
+
+        return view('customer.dashboard', compact('barbers', 'services', 'activeBooking'));
     }
 }
