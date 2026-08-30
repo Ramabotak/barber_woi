@@ -65,12 +65,5 @@
                 </button>
             </form>
         @endif
-        @if($booking->status === 'cancelled' && $booking->payment && $booking->payment->status !== 'refunded')
-            <form action="{{ route('admin.bookings.refund', $booking) }}" method="POST">
-                @csrf @method('PATCH')
-                <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"
-                        onclick="return confirm('Proses refund untuk booking ini?')">Proses Refund</button>
-            </form>
-        @endif
     </div>
 @endsection

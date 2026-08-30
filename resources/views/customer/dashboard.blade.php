@@ -5,7 +5,7 @@
 @section('content')
     @php
         $statusLabels = [
-            'pending' => 'Menunggu Pembayaran', 'paid' => 'Sudah Dibayar', 'accepted' => 'Diterima',
+            'pending' => 'Menunggu Persetujuan', 'accepted' => 'Siap Dibayar', 'paid' => 'Sudah Dibayar',
             'waiting' => 'Menunggu Giliran', 'late' => 'Terlambat', 'serving' => 'Sedang Dilayani',
             'completed' => 'Selesai', 'cancelled' => 'Dibatalkan',
         ];

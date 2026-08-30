@@ -30,16 +30,16 @@ class NotificationService
     public function notifyBookingAccepted(Booking $booking): void
     {
         $this->send($booking->customer_id, $booking->id, 'Booking Diterima',
-            "Booking {$booking->booking_code} telah diterima. Nomor antrean Anda: {$booking->queue_number}.");
+            "Booking {$booking->booking_code} telah diterima. Silakan selesaikan pembayaran untuk mengamankan antrean Anda.");
     }
 
     public function notifyBookingPaid(Booking $booking): void
     {
         $this->send($booking->customer_id, $booking->id, 'Pembayaran Berhasil',
-            "Pembayaran booking {$booking->booking_code} berhasil. Menunggu konfirmasi barber.");
+            "Pembayaran booking {$booking->booking_code} berhasil. Booking Anda sudah masuk antrean.");
 
         $this->send($booking->barber->user_id, $booking->id, 'Booking Dibayar',
-            "Ada booking {$booking->booking_code} yang sudah dibayar, menunggu konfirmasi Anda.");
+            "Booking {$booking->booking_code} sudah dibayar dan siap dilayani.");
     }
 
     public function notifyBookingRejected(Booking $booking): void
@@ -63,9 +63,4 @@ class NotificationService
             "Booking {$booking->booking_code} sekarang {$label}.");
     }
 
-    public function notifyRefundProcessed(Booking $booking): void
-    {
-        $this->send($booking->customer_id, $booking->id, 'Refund Diproses',
-            "Pembayaran untuk booking {$booking->booking_code} telah direfund oleh admin.");
-    }
 }

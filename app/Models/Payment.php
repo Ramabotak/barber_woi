@@ -17,6 +17,7 @@ class Payment extends Model
         'transaction_id',
         'snap_token',
         'payment_data',
+        'expires_at',
         'paid_at',
         'refunded_at',
     ];
@@ -25,6 +26,7 @@ class Payment extends Model
         'paid_at' => 'datetime',
         'refunded_at' => 'datetime',
         'payment_data' => 'array',
+        'expires_at' => 'datetime',
     ];
 
     public function booking()

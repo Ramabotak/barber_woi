@@ -56,19 +56,6 @@ class BookingController extends Controller
         return back()->with('success', "Booking {$booking->booking_code} dibatalkan.");
     }
 
-    public function refund(Booking $booking): RedirectResponse
-    {
-        abort_unless($booking->status === 'cancelled', 422, 'Refund hanya untuk booking yang dibatalkan.');
-
-        $payment = $booking->payment;
-        abort_unless($payment && $payment->status !== 'refunded', 422, 'Pembayaran tidak dapat direfund.');
-
-        $payment->update(['status' => 'refunded', 'refunded_at' => now()]);
-        $this->notificationService->notifyRefundProcessed($booking);
-
-        return back()->with('success', "Refund untuk booking {$booking->booking_code} diproses.");
-    }
-
     // Jalan pintas admin: langsung tandai selesai dari status apa pun (kecuali
     // yang sudah completed/cancelled), tanpa harus lewat urutan status normal.
     // Berguna untuk kasus status nyangkut, misalnya webhook pembayaran belum

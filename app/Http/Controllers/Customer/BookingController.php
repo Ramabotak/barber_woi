@@ -73,9 +73,8 @@ class BookingController extends Controller
             slotTime: $validated['slot_time'],
         );
 
-        // Midtrans sudah aktif, arahkan ke halaman pembayaran Snap.
-        return redirect()->route('customer.payment.show', $booking)
-            ->with('success', "Booking {$booking->booking_code} berhasil dibuat. Silakan lanjutkan pembayaran.");
+        return redirect()->route('customer.booking.show', $booking)
+            ->with('success', "Booking {$booking->booking_code} berhasil dibuat. Menunggu persetujuan barber sebelum pembayaran.");
     }
 
     public function index(Request $request): View

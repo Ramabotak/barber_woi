@@ -30,13 +30,13 @@ class Booking extends Model
     ];
 
     // Alur status booking yang valid:
-    // pending (dibuat, belum bayar) -> paid (sudah bayar, menunggu konfirmasi barber)
-    // paid -> accepted (barber terima) -> waiting/serving -> completed/cancelled.
+    // pending (dibuat, menunggu persetujuan barber) -> accepted (siap dibayar)
+    // -> paid (lunas, masuk antrean) -> waiting/serving -> completed/cancelled.
     // Dipakai untuk mencegah status "lompat" (mis. pending langsung ke completed).
     public const STATUS_FLOW = [
-        'pending' => ['paid', 'accepted', 'cancelled'],
-        'paid' => ['accepted', 'cancelled'],
-        'accepted' => ['waiting', 'cancelled'],
+        'pending' => ['accepted', 'cancelled'],
+        'accepted' => ['paid', 'cancelled'],
+        'paid' => ['waiting', 'cancelled'],
         'waiting' => ['serving', 'late', 'cancelled'],
         'late' => ['serving', 'cancelled'],
         'serving' => ['completed', 'cancelled'],

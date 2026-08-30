@@ -5,14 +5,14 @@
 @section('content')
     @php
         $statusLabels = [
-            'pending' => 'Menunggu Pembayaran', 'paid' => 'Sudah Dibayar', 'accepted' => 'Diterima',
+            'pending' => 'Menunggu Persetujuan', 'accepted' => 'Siap Dibayar', 'paid' => 'Sudah Dibayar',
             'waiting' => 'Menunggu Giliran', 'late' => 'Terlambat', 'serving' => 'Sedang Dilayani',
             'completed' => 'Selesai', 'cancelled' => 'Dibatalkan',
         ];
-        $currentStep = ['pending' => 1, 'paid' => 2, 'accepted' => 3, 'waiting' => 3, 'late' => 3, 'serving' => 4, 'completed' => 5][$booking->status] ?? 0;
+        $currentStep = ['pending' => 1, 'accepted' => 2, 'paid' => 3, 'waiting' => 4, 'late' => 4, 'serving' => 4, 'completed' => 5][$booking->status] ?? 0;
         $steps = [
-            ['label' => 'Dibuat', 'icon' => 'check'], ['label' => 'Pembayaran', 'icon' => 'payments'],
-            ['label' => 'Diterima', 'icon' => 'event_available'], ['label' => 'Dilayani', 'icon' => 'content_cut'],
+            ['label' => 'Dibuat', 'icon' => 'check'], ['label' => 'Disetujui', 'icon' => 'event_available'],
+            ['label' => 'Pembayaran', 'icon' => 'payments'], ['label' => 'Dilayani', 'icon' => 'content_cut'],
             ['label' => 'Selesai', 'icon' => 'flag'],
         ];
         $amount = $booking->payment?->amount ?? $booking->service->price;
@@ -65,9 +65,11 @@
             @if(!in_array($booking->status, ['completed', 'cancelled']))
                 <section class="rounded-xl border border-gray-200 bg-white p-5">
                     @if($booking->payment && $booking->payment->status === 'paid')
-                        <div class="flex items-center gap-2 text-brandsuccess"><span class="material-symbols-outlined">task_alt</span><span class="text-sm font-bold">Pembayaran Berhasil</span></div><p class="mt-3 text-xs leading-5 text-muted">Pembayaran telah diterima. Booking Anda akan diproses oleh barber.</p>@if($booking->payment->paid_at)<p class="mt-3 rounded-lg bg-brandsuccess/10 px-3 py-2 text-xs font-medium text-brandsuccess">Dibayar {{ $booking->payment->paid_at->translatedFormat('d M Y, H:i') }} WIB</p>@endif
-                    @else
+                        <div class="flex items-center gap-2 text-brandsuccess"><span class="material-symbols-outlined">task_alt</span><span class="text-sm font-bold">Pembayaran Berhasil</span></div><p class="mt-3 text-xs leading-5 text-muted">Pembayaran telah diterima. Booking Anda sudah masuk antrean layanan.</p>@if($booking->payment->paid_at)<p class="mt-3 rounded-lg bg-brandsuccess/10 px-3 py-2 text-xs font-medium text-brandsuccess">Dibayar {{ $booking->payment->paid_at->translatedFormat('d M Y, H:i') }} WIB</p>@endif
+                    @elseif($booking->status === 'accepted')
                         <div class="flex items-center gap-2 text-brandwarning"><span class="material-symbols-outlined">info</span><span class="text-sm font-bold">Menunggu Pembayaran</span></div><p class="mt-3 text-xs leading-5 text-muted">Selesaikan pembayaran agar slot antrean Anda dapat diproses oleh barber.</p><div class="mt-4 rounded-lg border border-gold/20 bg-gold/10 px-3 py-2.5"><p class="text-[10px] font-bold uppercase tracking-wider text-brandwarning">Total yang harus dibayar</p><p class="mt-1 text-sm font-bold text-charcoal">Rp {{ number_format($amount, 0, ',', '.') }}</p></div><div class="mt-4 grid gap-2"><a href="{{ route('customer.payment.show', $booking) }}" class="inline-flex min-h-11 items-center justify-center rounded-lg bg-gold px-4 py-3 text-sm font-bold text-charcoal transition hover:bg-[#dbb45d]"><span class="material-symbols-outlined mr-2 text-[19px]">payments</span>Bayar Sekarang</a>@if($booking->payment)<form action="{{ route('customer.payment.check', $booking) }}" method="POST">@csrf<button type="submit" class="inline-flex w-full min-h-10 items-center justify-center rounded-lg border border-gray-200 px-4 py-2.5 text-xs font-bold text-charcoal transition hover:bg-cream">Cek Status Pembayaran</button></form>@endif</div>
+                    @else
+                        <div class="flex items-center gap-2 text-brandwarning"><span class="material-symbols-outlined">pending_actions</span><span class="text-sm font-bold">Menunggu Persetujuan Barber</span></div><p class="mt-3 text-xs leading-5 text-muted">Barber sedang meninjau booking Anda. Pembayaran baru dapat dilakukan setelah booking diterima.</p>
                     @endif
                 </section>
             @endif

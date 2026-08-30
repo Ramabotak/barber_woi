@@ -139,15 +139,6 @@
                                             </button>
                                         </form>
                                     @endif
-                                    @if ($booking->status === 'cancelled' && $booking->payment && $booking->payment->status !== 'refunded')
-                                        <form action="{{ route('admin.bookings.refund', $booking) }}" method="POST"
-                                              onsubmit="return confirm('Proses refund untuk booking ini?')">
-                                            @csrf @method('PATCH')
-                                            <button type="submit" class="p-1.5 text-gray-500 hover:text-charcoal transition-colors rounded hover:bg-gray-100" title="Refund">
-                                                <span class="material-symbols-outlined text-[18px]">currency_exchange</span>
-                                            </button>
-                                        </form>
-                                    @endif
                                 </div>
                             </td>
                         </tr>

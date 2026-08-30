@@ -24,6 +24,11 @@ class PaymentController extends Controller
     {
         abort_unless($booking->customer_id === $request->user()->id, 403);
 
+        if ($booking->status !== 'accepted') {
+            return redirect()->route('customer.booking.show', $booking)
+                ->with('error', 'Pembayaran tersedia setelah booking diterima oleh barber.');
+        }
+
         if ($booking->payment && $booking->payment->status === 'paid') {
             return redirect()->route('customer.booking.show', $booking)->with('success', 'Booking ini sudah dibayar.');
         }
@@ -33,6 +38,8 @@ class PaymentController extends Controller
             'payment' => $booking->payment,
             'clientKey' => config('midtrans.client_key'),
             'isProduction' => config('midtrans.is_production'),
+            'paymentDriver' => $this->midtransService->driver(),
+            'availableMethods' => $this->midtransService->availableMethods(),
         ]);
     }
 
@@ -40,17 +47,25 @@ class PaymentController extends Controller
     {
         abort_unless($booking->customer_id === $request->user()->id, 403);
 
+        abort_unless($booking->status === 'accepted', 422, 'Booking harus diterima barber sebelum pembayaran dibuat.');
+
         $validated = $request->validate([
-            'method' => ['required', 'in:qris,bca,bni,bri,permata'],
+            'method' => ['required', 'in:' . implode(',', $this->midtransService->availableMethods())],
+            // This is generated in the browser by Midtrans.js. Never accept raw card fields here.
+            'token_id' => ['nullable', 'string', 'max:255'],
         ]);
 
         try {
-            // Kanal Core API akun sandbox ini belum aktif (Midtrans HTTP 402).
-            // Tetap gunakan Snap yang sudah aktif agar pembayaran customer tidak terblokir.
-            $this->midtransService->createSnapTransaction($booking, $validated['method']);
+            if ($this->midtransService->driver() === 'core') {
+                $this->midtransService->createCoreTransaction($booking, $validated['method'], [
+                    'token_id' => $validated['token_id'] ?? null,
+                ]);
+            } else {
+                $this->midtransService->createSnapTransaction($booking, $validated['method']);
+            }
         } catch (\Throwable $e) {
-            Log::error('Midtrans Snap transaction error: ' . $e->getMessage());
-            return back()->with('error', 'Pembayaran belum dapat disiapkan. Silakan coba kembali dalam beberapa saat.');
+            Log::error('Midtrans transaction error: ' . $e->getMessage());
+            return back()->with('error', $this->midtransService->errorMessage($e));
         }
 
         return redirect()->route('customer.payment.show', $booking);
@@ -60,7 +75,7 @@ class PaymentController extends Controller
     public function callback(Request $request): JsonResponse
     {
         try {
-            $result = $this->midtransService->handleCallback($request->all());
+            $result = $this->midtransService->normalizeNotification($request->all());
         } catch (\Throwable $e) {
             Log::error('Midtrans callback error: ' . $e->getMessage());
             return response()->json(['message' => 'invalid notification'], 400);
@@ -85,6 +100,8 @@ class PaymentController extends Controller
     {
         abort_unless($booking->customer_id === $request->user()->id, 403);
 
+        abort_unless(in_array($booking->status, ['accepted', 'paid'], true), 422, 'Status pembayaran belum tersedia untuk booking ini.');
+
         if (!$booking->payment || !$booking->payment->transaction_id) {
             return redirect()->route('customer.booking.show', $booking)
                 ->with('error', 'Belum ada transaksi pembayaran untuk booking ini.');
@@ -103,6 +120,36 @@ class PaymentController extends Controller
             ->with('success', 'Status pembayaran berhasil disinkronkan.');
     }
 
+    /**
+     * Sandbox helper: Midtrans documents browser simulators for VA, rather than
+     * a merchant-callable settlement API. Never expose this route in production.
+     */
+    public function openSandboxVaSimulator(Request $request, Booking $booking): RedirectResponse
+    {
+        abort_unless($booking->customer_id === $request->user()->id, 403);
+        abort_if(app()->environment('production') || config('midtrans.is_production'), 404);
+
+        $payment = $booking->payment;
+        abort_unless($payment && $payment->status === 'pending', 422, 'Tidak ada pembayaran VA yang dapat disimulasikan.');
+
+        $paymentType = data_get($payment->payment_data, 'payment_type');
+        abort_unless(in_array($paymentType, ['bank_transfer', 'echannel'], true), 422, 'Simulator hanya tersedia untuk Virtual Account dan Mandiri Bill.');
+
+        $bank = data_get($payment->payment_data, 'instruction.bank')
+            ?? data_get($payment->payment_data, 'va_numbers.0.bank')
+            ?? ($paymentType === 'echannel' ? 'mandiri' : null);
+        $urls = [
+            'bca' => 'https://simulator.sandbox.midtrans.com/bca/va/index',
+            'bni' => 'https://simulator.sandbox.midtrans.com/bni/va/index',
+            'bri' => 'https://simulator.sandbox.midtrans.com/openapi/va/index?bank=bri',
+            'permata' => 'https://simulator.sandbox.midtrans.com/openapi/va/index?bank=permata',
+            'mandiri' => 'https://simulator.sandbox.midtrans.com/openapi/va/index?bank=mandiri',
+        ];
+
+        abort_unless(isset($urls[$bank]), 422, 'Simulator untuk bank ini belum tersedia.');
+        return redirect()->away($urls[$bank]);
+    }
+
     protected function applyPaymentResult(array $result): bool
     {
         $payment = Payment::where('transaction_id', $result['order_id'])->first();
@@ -110,18 +157,12 @@ class PaymentController extends Controller
             return false;
         }
 
-        $payment->status = $result['status'];
-        $payment->payment_method = $result['payment_type'] ?? $payment->payment_method;
-        if ($result['status'] === 'paid' && !$payment->paid_at) {
-            $payment->paid_at = now();
-        }
-        $payment->save();
+        $payment = $this->midtransService->applyGatewayResponse($payment, $result);
 
         $booking = $payment->booking;
-        if ($result['status'] === 'paid' && $booking->status === 'pending') {
-            // Pembayaran sukses, booking jadi 'paid' (menunggu konfirmasi barber
-            // di halaman Booking Masuk). Barber yang menerima (Terima) yang
-            // mengubahnya jadi 'accepted' agar masuk antrean.
+        if ($payment->status === 'paid' && $booking->status === 'accepted') {
+            // Booking baru dapat dibayar setelah disetujui barber. Saat lunas,
+            // booking langsung siap masuk antrean layanan.
             $booking->update(['status' => 'paid']);
             $this->notificationService->notifyBookingPaid($booking);
         }

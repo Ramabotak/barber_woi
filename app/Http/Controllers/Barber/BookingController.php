@@ -31,8 +31,7 @@ class BookingController extends Controller
 
         $bookings = Booking::with(['customer', 'service', 'schedule', 'payment'])
             ->where('barber_id', $barber->id)
-            ->whereIn('status', ['pending', 'paid'])
-            ->orderByRaw("FIELD(status, 'paid', 'pending')")
+            ->where('status', 'pending')
             ->orderBy('created_at')
             ->get();
 
@@ -74,7 +73,7 @@ class BookingController extends Controller
     {
         $this->authorizeOwns($request, $booking);
 
-        if ($booking->status === 'accepted') {
+        if (in_array($booking->status, ['accepted', 'paid'], true)) {
             $this->bookingService->transitionStatus($booking, 'waiting');
         }
 

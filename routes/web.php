@@ -102,6 +102,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::get('/payment/{booking}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{booking}/method', [PaymentController::class, 'chooseMethod'])->name('payment.method');
     Route::post('/payment/{booking}/check', [PaymentController::class, 'checkStatus'])->name('payment.check');
+    Route::post('/payment/{booking}/sandbox-simulator', [PaymentController::class, 'openSandboxVaSimulator'])->name('payment.sandbox-simulator');
 });
 
 /*
@@ -152,11 +153,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/services/{service}', [AdminServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{service}', [AdminServiceController::class, 'destroy'])->name('services.destroy');
 
-    // Kelola Booking + refund
+    // Kelola Booking
     Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [AdminBookingController::class, 'show'])->name('bookings.show');
     Route::patch('/bookings/{booking}/cancel', [AdminBookingController::class, 'cancel'])->name('bookings.cancel');
-    Route::patch('/bookings/{booking}/refund', [AdminBookingController::class, 'refund'])->name('bookings.refund');
     Route::patch('/bookings/{booking}/force-complete', [AdminBookingController::class, 'forceComplete'])->name('bookings.force-complete');
 
     // Laporan keuangan, pengeluaran, dan payroll barber

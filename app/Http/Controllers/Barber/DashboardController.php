@@ -19,14 +19,13 @@ class DashboardController extends Controller
 
         $pendingBookings = Booking::with(['customer', 'service', 'schedule'])
             ->where('barber_id', $barber->id)
-            ->whereIn('status', ['pending', 'paid'])
-            ->orderByRaw("FIELD(status, 'paid', 'pending')")
+            ->where('status', 'pending')
             ->orderBy('created_at')
             ->get();
 
         $servingBookings = Booking::with(['customer', 'service', 'schedule'])
             ->where('barber_id', $barber->id)
-            ->whereIn('status', ['accepted', 'waiting', 'late', 'serving'])
+            ->whereIn('status', ['paid', 'waiting', 'late', 'serving'])
             ->orderBy('queue_number')
             ->get();
 
