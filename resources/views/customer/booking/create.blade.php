@@ -145,7 +145,7 @@
         const bookingReady = choicesReady && selectedScheduleInput.value && selectedSlotTimeInput.value;
         scheduleNextBtn.disabled = !choicesReady;
         submitBtn.disabled = !bookingReady;
-        if (bookingReady) confirmationStep.classList.remove('hidden');
+        confirmationStep.classList.toggle('hidden', !bookingReady);
         renderSummary();
     }
 
@@ -204,9 +204,15 @@
             selectedScheduleInput.value = '';
             selectedSlotTimeInput.value = '';
 
+            if (!selectedServiceInput.value) {
+                scheduleContainer.innerHTML = '<div class="rounded-lg border border-dashed border-gray-300 bg-cream px-4 py-6 text-center text-sm text-muted">Pilih layanan terlebih dahulu untuk melihat jam yang sesuai dengan durasinya.</div>';
+                checkReadyToSubmit();
+                return;
+            }
+
             scheduleContainer.innerHTML = '<div class="flex items-center gap-2 py-5 text-sm text-muted"><span class="material-symbols-outlined animate-spin text-gold">progress_activity</span>Memuat jadwal tersedia...</div>';
 
-            fetch(`{{ url('customer/booking/barber') }}/${barberId}/schedules`)
+            fetch(`{{ url('customer/booking/barber') }}/${barberId}/schedules?service_id=${encodeURIComponent(selectedServiceInput.value)}`)
                 .then(res => res.json())
                 .then(schedules => {
                     if (schedules.length === 0) {
@@ -221,7 +227,7 @@
                             <div class="schedule-day overflow-hidden rounded-xl border border-gray-200 bg-white ${hasAvailable ? 'cursor-pointer hover:border-gold transition-colors' : 'opacity-60'}"
                                  data-schedule-id="${s.id}" data-date-label="${s.date_label}">
                                 <div class="day-toggle flex items-center justify-between px-4 py-4">
-                                    <div><p class="text-sm font-bold text-charcoal">${s.date_label}</p><p class="mt-1 text-[10px] font-medium text-muted">Pilih waktu yang tersedia</p></div>
+                                    <div><p class="text-sm font-bold text-charcoal">${s.date_label}</p><p class="mt-1 text-[10px] font-medium text-muted">Layanan ini mengunci ${s.locked_slots} kotak × 30 menit berturut-turut</p></div>
                                     <span class="rounded-full ${hasAvailable ? 'bg-brandsuccess/10 text-brandsuccess' : 'bg-gray-100 text-muted'} px-2.5 py-1 text-[10px] font-bold">${hasAvailable ? 'Pilih jam' : 'Slot penuh'}</span>
                                 </div>
                                 <div class="slot-list hidden grid grid-cols-3 gap-2 border-t border-gray-100 bg-cream/60 px-4 pb-4 pt-3 sm:grid-cols-4 md:grid-cols-5"></div>
@@ -314,6 +320,13 @@
             option.querySelector('.selection-check')?.classList.add('flex');
             state.serviceName = option.querySelector('p').textContent.trim();
             selectedServiceInput.value = option.dataset.serviceId;
+            selectedScheduleInput.value = '';
+            selectedSlotTimeInput.value = '';
+
+            // Ketersediaan jam bergantung pada durasi layanan. Muat ulang slot
+            // jika barber sudah dipilih agar, misalnya, coloring hanya menawarkan
+            // tiga kotak 30-menit yang kosong berurutan.
+            document.querySelector('.barber-option.border-gold')?.click();
             checkReadyToSubmit();
         });
     });

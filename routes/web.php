@@ -100,6 +100,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::get('/booking/barber/{barber}/reviews', [ReviewController::class, 'barberReviews'])->name('booking.barber.reviews');
 
     Route::get('/payment/{booking}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment/{booking}/method', [PaymentController::class, 'chooseMethod'])->name('payment.method');
     Route::post('/payment/{booking}/check', [PaymentController::class, 'checkStatus'])->name('payment.check');
 });
 

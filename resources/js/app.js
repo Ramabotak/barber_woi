@@ -8,6 +8,19 @@ window.Chart = Chart;
 
 window.Alpine = Alpine;
 
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    document.querySelectorAll('main > *').forEach((element, index) => {
+        element.classList.add('page-enter');
+        element.style.animationDelay = `${Math.min(index * 75, 450)}ms`;
+    });
+
+    document.querySelectorAll('main article, main .group, main [class*="rounded-xl"], main [class*="rounded-2xl"]').forEach((element) => {
+        element.classList.add('motion-card');
+    });
+});
+
 document.addEventListener('alpine:init', () => {
     Alpine.store('notif', {
         unreadCount: 0,

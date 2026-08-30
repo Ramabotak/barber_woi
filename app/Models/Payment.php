@@ -16,6 +16,7 @@ class Payment extends Model
         'status',
         'transaction_id',
         'snap_token',
+        'payment_data',
         'paid_at',
         'refunded_at',
     ];
@@ -23,6 +24,7 @@ class Payment extends Model
     protected $casts = [
         'paid_at' => 'datetime',
         'refunded_at' => 'datetime',
+        'payment_data' => 'array',
     ];
 
     public function booking()

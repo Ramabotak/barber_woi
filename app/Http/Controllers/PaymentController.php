@@ -28,14 +28,32 @@ class PaymentController extends Controller
             return redirect()->route('customer.booking.show', $booking)->with('success', 'Booking ini sudah dibayar.');
         }
 
-        $payment = $this->midtransService->createSnapTransaction($booking);
-
         return view('customer.payment.show', [
             'booking' => $booking,
-            'payment' => $payment,
+            'payment' => $booking->payment,
             'clientKey' => config('midtrans.client_key'),
             'isProduction' => config('midtrans.is_production'),
         ]);
+    }
+
+    public function chooseMethod(Request $request, Booking $booking): RedirectResponse
+    {
+        abort_unless($booking->customer_id === $request->user()->id, 403);
+
+        $validated = $request->validate([
+            'method' => ['required', 'in:qris,bca,bni,bri,permata'],
+        ]);
+
+        try {
+            // Kanal Core API akun sandbox ini belum aktif (Midtrans HTTP 402).
+            // Tetap gunakan Snap yang sudah aktif agar pembayaran customer tidak terblokir.
+            $this->midtransService->createSnapTransaction($booking, $validated['method']);
+        } catch (\Throwable $e) {
+            Log::error('Midtrans Snap transaction error: ' . $e->getMessage());
+            return back()->with('error', 'Pembayaran belum dapat disiapkan. Silakan coba kembali dalam beberapa saat.');
+        }
+
+        return redirect()->route('customer.payment.show', $booking);
     }
 
     // Webhook Midtrans, tidak pakai auth/CSRF (dikecualikan di bootstrap/app.php).

@@ -8,15 +8,13 @@ use App\Models\Booking;
 use App\Models\Schedule;
 use App\Models\Service;
 use App\Services\BookingService;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BookingController extends Controller
 {
-    public function __construct(protected BookingService $bookingService)
-    {
-    }
+    public function __construct(protected BookingService $bookingService) {}
 
     public function create(): View
     {
@@ -36,8 +34,13 @@ class BookingController extends Controller
     }
 
     // Dipanggil via fetch/AJAX setelah customer pilih barber, untuk ambil jadwal tersedia.
-    public function availableSchedules(Barber $barber)
+    public function availableSchedules(Request $request, Barber $barber)
     {
+        $validated = $request->validate([
+            'service_id' => ['required', 'integer', 'exists:services,id'],
+        ]);
+        $service = Service::active()->findOrFail($validated['service_id']);
+
         $schedules = Schedule::where('barber_id', $barber->id)
             ->available()
             ->where('date', '>=', now()->toDateString())
@@ -48,7 +51,8 @@ class BookingController extends Controller
             'id' => $schedule->id,
             'date' => $schedule->date->format('Y-m-d'),
             'date_label' => $schedule->date->locale('id')->translatedFormat('l, d M Y'),
-            'slots' => $this->bookingService->slots($schedule),
+            'locked_slots' => max((int) ceil($service->duration / BookingService::SLOT_MINUTES), 1),
+            'slots' => $this->bookingService->slots($schedule, $service),
         ]));
     }
 

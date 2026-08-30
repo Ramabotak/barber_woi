@@ -17,8 +17,8 @@
     <header class="sticky top-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur">
         <div class="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-4 sm:px-6">
             <a href="{{ route('customer.dashboard') }}" class="flex items-center gap-2.5">
-                <span class="flex h-9 w-9 items-center justify-center rounded-full bg-charcoal text-gold">
-                    <x-application-logo class="h-5 w-5 fill-current" />
+                <span class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-charcoal text-gold">
+                    <x-application-logo class="h-full w-full scale-110" />
                 </span>
                 <span class="font-heading text-base font-bold tracking-tight text-charcoal">Barber Woi</span>
             </a>

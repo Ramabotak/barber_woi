@@ -37,8 +37,8 @@
     {{-- Sidebar --}}
     <aside class="hidden md:flex md:flex-col w-64 bg-charcoal text-cream/80 h-screen flex-shrink-0">
         <div class="px-6 py-6 flex items-center gap-3 border-b border-white/10">
-            <span class="w-10 h-10 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center flex-shrink-0">
-                <x-application-logo class="w-5 h-5 fill-gold" />
+            <span class="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-gold/30 bg-gold/10">
+                <x-application-logo class="h-full w-full scale-110" />
             </span>
             <div>
                 <h1 class="font-heading text-base font-bold text-white leading-tight">Barber Woi</h1>

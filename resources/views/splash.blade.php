@@ -40,9 +40,7 @@
 
         {{-- Logo & tagline --}}
         <div class="flex-1 flex flex-col items-center justify-center space-y-4" id="logo-container">
-            <div class="w-16 h-16 rounded-full border border-gold flex items-center justify-center mb-2">
-                <span class="material-symbols-outlined text-gold text-3xl" style="font-variation-settings: 'FILL' 1;">content_cut</span>
-            </div>
+            <div class="mb-2 h-40 w-40 overflow-hidden rounded-full drop-shadow-[0_4px_24px_rgba(201,162,75,0.45)] md:h-48 md:w-48"><img src="{{ asset('images/barber-woi-logo.png') }}" alt="Logo Barber Woi" class="h-full w-full scale-110 object-cover"></div>
             <h1 class="font-heading text-4xl md:text-6xl font-bold text-gold text-shadow-gold tracking-tight uppercase">
                 Barber WOI
             </h1>
