@@ -41,6 +41,7 @@ class BookingController extends Controller
 
     public function show(Booking $booking): View
     {
+        $this->authorize('view', $booking);
         $booking->load(['customer', 'barber.user', 'service', 'schedule', 'payment', 'review']);
 
         return view('admin.bookings.show', compact('booking'));
@@ -48,6 +49,7 @@ class BookingController extends Controller
 
     public function cancel(Booking $booking): RedirectResponse
     {
+        $this->authorize('update', $booking);
         abort_if(in_array($booking->status, ['completed', 'cancelled'], true), 422, 'Booking tidak bisa dibatalkan.');
 
         $booking->update(['status' => 'cancelled']);
@@ -62,6 +64,7 @@ class BookingController extends Controller
     // sempat masuk saat testing.
     public function forceComplete(Booking $booking): RedirectResponse
     {
+        $this->authorize('forceActions', $booking);
         abort_if(in_array($booking->status, ['completed', 'cancelled'], true), 422, 'Booking ini sudah final.');
 
         $booking->update([

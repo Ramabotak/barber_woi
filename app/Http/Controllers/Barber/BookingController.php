@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Services\BookingService;
 use App\Services\NotificationService;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BookingController extends Controller
@@ -15,8 +15,7 @@ class BookingController extends Controller
     public function __construct(
         protected BookingService $bookingService,
         protected NotificationService $notificationService
-    ) {
-    }
+    ) {}
 
     protected function authorizeOwns(Request $request, Booking $booking): void
     {
@@ -27,7 +26,6 @@ class BookingController extends Controller
     public function incoming(Request $request): View
     {
         $barber = $request->user()->barber;
-        abort_unless($barber, 403);
 
         $bookings = Booking::with(['customer', 'service', 'schedule', 'payment'])
             ->where('barber_id', $barber->id)
@@ -59,11 +57,13 @@ class BookingController extends Controller
     public function activeQueue(Request $request): View
     {
         $barber = $request->user()->barber;
-        abort_unless($barber, 403);
 
         $bookings = Booking::with(['customer', 'service', 'schedule'])
             ->where('barber_id', $barber->id)
-            ->whereIn('status', ['accepted', 'waiting', 'late', 'serving'])
+            // Hanya booking yang sudah lunas yang masuk antrean layanan.
+            // Status accepted masih menunggu pembayaran, sedangkan paid harus
+            // terlihat agar barber dapat mulai melayani pelanggan.
+            ->whereIn('status', ['paid', 'waiting', 'late', 'serving'])
             ->orderBy('queue_number')->get();
 
         return view('barber.booking.queue', compact('bookings'));
@@ -73,11 +73,12 @@ class BookingController extends Controller
     {
         $this->authorizeOwns($request, $booking);
 
-        if (in_array($booking->status, ['accepted', 'paid'], true)) {
+        // Transition langsung ke serving dari status yang valid
+        if ($booking->status === 'paid') {
             $this->bookingService->transitionStatus($booking, 'waiting');
+            $booking->refresh();
         }
-
-        $booking->refresh();
+        
         $this->bookingService->transitionStatus($booking, 'serving');
         $this->notificationService->notifyStatusChanged($booking);
 

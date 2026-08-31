@@ -110,8 +110,9 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
 | Barber
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:barber'])->prefix('barber')->name('barber.')->group(function () {
+Route::middleware(['auth', 'role:barber', 'ensure_barber_profile'])->prefix('barber')->name('barber.')->group(function () {
     Route::get('/dashboard', [BarberDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [BarberDashboardController::class, 'profile'])->name('profile');
 
     Route::get('/booking/incoming', [BarberBookingController::class, 'incoming'])->name('booking.incoming');
     Route::patch('/booking/{booking}/accept', [BarberBookingController::class, 'accept'])->name('booking.accept');
@@ -188,4 +189,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 */
 Route::post('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 
+Route::get('/test-broadcast', function () {
+    $notification = \App\Models\Notification::first();
+    if ($notification) {
+        event(new \App\Events\NotificationSent($notification));
+        return response()->json(['message' => 'Broadcast event fired', 'notification_id' => $notification->id]);
+    }
+    return response()->json(['message' => 'No notification found'], 404);
+});
 require __DIR__.'/auth.php';
+
+

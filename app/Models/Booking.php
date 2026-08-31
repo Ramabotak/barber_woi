@@ -24,7 +24,7 @@ class Booking extends Model
     ];
 
     protected $casts = [
-        'slot_time' => 'datetime',
+        'slot_time' => 'datetime:H:i:s',
         'check_in_time' => 'datetime',
         'finished_at' => 'datetime',
     ];

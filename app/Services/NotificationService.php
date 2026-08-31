@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Events\NotificationSent;
+
 use App\Models\Booking;
 use App\Models\Notification;
 
@@ -9,13 +11,18 @@ class NotificationService
 {
     public function send(int $userId, int $bookingId, string $title, string $message): Notification
     {
-        return Notification::create([
+        $notification = Notification::create([
             'booking_id' => $bookingId,
             'user_id' => $userId,
             'title' => $title,
             'message' => $message,
             'is_read' => false,
         ]);
+
+        // Broadcast real-time notification via WebSocket
+        broadcast(new NotificationSent($notification))->toOthers();
+
+        return $notification;
     }
 
     public function notifyBookingCreated(Booking $booking): void

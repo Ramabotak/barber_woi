@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; line-height: 1; }
@@ -30,6 +30,7 @@
             </nav>
 
             <div class="flex items-center gap-2">
+                <a href="{{ route('customer.booking.create') }}" class="hidden min-h-10 items-center gap-2 rounded-full bg-charcoal px-4 text-xs font-extrabold text-white shadow-[0_6px_16px_rgba(28,28,30,0.14)] transition hover:-translate-y-0.5 hover:bg-black lg:inline-flex"><span class="material-symbols-outlined text-[17px] text-gold">add</span>Buat booking</a>
                 <a href="{{ route('notifications.index') }}" class="relative rounded-full p-2 text-muted transition-colors hover:bg-gray-100 hover:text-charcoal" aria-label="Notifikasi" x-data>
                     <span class="material-symbols-outlined text-[21px]">notifications</span>
                     <span x-show="$store.notif.unreadCount > 0" x-cloak x-text="$store.notif.unreadCount > 9 ? '9+' : $store.notif.unreadCount" class="absolute right-0 top-0 min-w-[15px] rounded-full bg-red-500 px-1 py-0.5 text-center text-[9px] font-bold leading-none text-white"></span>
@@ -48,7 +49,8 @@
                 <div><p class="font-heading font-bold text-charcoal">{{ auth()->user()->name }}</p><p class="mt-0.5 text-xs text-muted">Customer Barber Woi</p></div>
                 <button type="button" @click="menuOpen = false" class="rounded-lg p-2 text-muted hover:bg-gray-100"><span class="material-symbols-outlined">close</span></button>
             </div>
-            <nav class="mt-4 space-y-1 text-sm font-semibold">
+            <a href="{{ route('customer.booking.create') }}" class="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-charcoal px-4 text-sm font-extrabold text-white"><span class="material-symbols-outlined text-[19px] text-gold">add</span>Buat booking</a>
+            <nav class="mt-4 space-y-1 border-t border-gray-100 pt-4 text-sm font-semibold">
                 <a href="{{ route('customer.dashboard') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-cream"><span class="material-symbols-outlined">home</span>Beranda</a>
                 <a href="{{ route('customer.booking.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-cream"><span class="material-symbols-outlined">calendar_month</span>Booking Saya</a>
                 <a href="{{ route('customer.reviews.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-cream"><span class="material-symbols-outlined">rate_review</span>Ulasan Saya</a>

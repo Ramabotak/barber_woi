@@ -2,6 +2,106 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --paper: #f5f1e9;
+    --paper-deep: #e9e1d4;
+    --ink: #171716;
+    --ink-soft: #4d4b46;
+    --brass: #b88a32;
+    --line: rgba(23, 23, 22, 0.12);
+}
+
+@layer base {
+    html {
+        background: var(--paper);
+    }
+
+    body {
+        color: var(--ink);
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+        background: #d8b66b;
+        color: #171716;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--brass);
+        outline-offset: 3px;
+    }
+}
+
+@layer components {
+    .surface-grain {
+        background-color: var(--paper);
+        background-image: radial-gradient(rgba(23, 23, 22, 0.055) 0.7px, transparent 0.7px);
+        background-size: 7px 7px;
+    }
+
+    .auth-input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        background: #fffdf9;
+        color: var(--ink);
+        font-size: 0.9375rem;
+        line-height: 1.25rem;
+        transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+    }
+
+    .auth-input::placeholder {
+        color: #9a958b;
+    }
+
+    .auth-input:hover {
+        border-color: rgba(23, 23, 22, 0.28);
+    }
+
+    .auth-input:focus {
+        border-color: var(--brass);
+        box-shadow: 0 0 0 4px rgba(184, 138, 50, 0.13);
+        outline: none;
+    }
+
+    .editorial-rule {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(184, 138, 50, 0.82), transparent);
+    }
+
+    /* Kept deliberately quiet: the dashboard should get users to a time slot,
+       not compete with another full-screen campaign image. */
+    .customer-dashboard-hero {
+        min-height: 0 !important;
+        border: 1px solid rgba(23, 23, 22, 0.12);
+        background: #eee4d1 !important;
+        color: var(--ink);
+    }
+
+    .customer-dashboard-hero > img,
+    .customer-dashboard-hero > .absolute {
+        display: none;
+    }
+
+    .customer-dashboard-hero .text-white,
+    .customer-dashboard-hero h2 {
+        color: var(--ink) !important;
+    }
+
+    .customer-dashboard-hero .text-cream\/70 {
+        color: var(--ink-soft) !important;
+    }
+
+    .customer-dashboard-hero .border-white\/20 {
+        border-color: rgba(23, 23, 22, 0.18) !important;
+    }
+
+    .customer-dashboard-hero a[href="#barber-pilihan"] {
+        color: var(--ink);
+    }
+}
+
 [x-cloak] {
     display: none !important;
 }

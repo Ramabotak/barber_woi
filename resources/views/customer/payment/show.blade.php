@@ -59,7 +59,7 @@
                 <div class="flex items-center justify-between"><p class="font-heading text-base font-extrabold text-charcoal">Ringkasan tagihan</p><span class="flex h-9 w-9 items-center justify-center rounded-xl bg-gold/15 text-gold"><span class="material-symbols-outlined text-[20px]">receipt_long</span></span></div>
                 <div class="mt-5 space-y-3 border-b border-gold/20 pb-5 text-sm"><div class="flex justify-between gap-4"><span class="text-muted">{{ $booking->service->service_name }}</span><span class="font-semibold text-charcoal">Rp {{ number_format($amount, 0, ',', '.') }}</span></div><div class="flex justify-between"><span class="text-muted">Biaya layanan</span><span class="font-semibold text-brandsuccess">Gratis</span></div></div>
                 <div class="mt-5 flex items-end justify-between"><span class="text-sm font-bold text-charcoal">Total</span><span class="font-heading text-2xl font-extrabold text-charcoal">Rp {{ number_format($amount, 0, ',', '.') }}</span></div>
-                @if($payment && $payment->payment_data && !$gatewayError)
+                @if($payment && $payment->payment_data && !$gatewayError && ($vaNumber || data_get($paymentData, 'payment_type') === 'echannel' || $qrUrl || $walletUrl))
                     <form method="POST" action="{{ route('customer.payment.check', $booking) }}" class="mt-6">@csrf<button type="submit" class="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-charcoal px-5 py-3.5 text-sm font-extrabold text-white transition hover:bg-charcoal/90"><span class="material-symbols-outlined text-[20px]">sync</span>Cek Status Pembayaran</button></form>
                 @elseif($payment && $payment->snap_token && $paymentDriver === 'snap')
                     <button id="pay-button" type="button" class="mt-6 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-gold px-5 py-3.5 text-sm font-extrabold text-charcoal shadow-[0_8px_18px_rgba(201,162,75,.28)] transition hover:bg-[#dbb45d] focus:outline-none focus:ring-4 focus:ring-gold/30 disabled:cursor-wait disabled:opacity-70"><span class="material-symbols-outlined text-[20px]">lock</span>Lanjutkan Pembayaran<span class="material-symbols-outlined text-[18px]">arrow_forward</span></button>
@@ -72,12 +72,68 @@
         </div>
         <div id="pay-error" role="alert" class="mt-5 hidden rounded-2xl border border-branddanger/20 bg-red-50 px-4 py-3 text-sm font-medium text-branddanger"></div>
         <form id="check-status-form" action="{{ route('customer.payment.check', $booking) }}" method="POST" class="hidden">@csrf</form>
-      @if($payment && $payment->payment_data && !$gatewayError && $paymentDriver === 'core')
+      @if($payment && $payment->payment_data && !$gatewayError && ($vaNumber || data_get($paymentData, 'payment_type') === 'echannel' || $qrUrl || $walletUrl || $paymentDriver === 'core'))
             <section class="mt-6 rounded-[24px] border border-brandsuccess/20 bg-white p-5 shadow-sm sm:p-7">
-                <div class="flex flex-wrap items-start justify-between gap-4"><div class="flex items-center gap-3"><span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brandsuccess/10 text-brandsuccess"><span class="material-symbols-outlined">payments</span></span><div><p class="text-[11px] font-bold uppercase tracking-wider text-brandsuccess">Instruksi pembayaran</p><h2 class="font-heading text-lg font-extrabold text-charcoal">{{ $paymentData['method_label'] ?? 'Pembayaran' }}</h2></div></div><div class="text-right"><p class="text-[10px] font-bold uppercase tracking-wider text-muted">Selesaikan sebelum</p><p class="mt-0.5 text-sm font-extrabold text-brandwarning" data-expiry="{{ $expiryAt }}">Memuat waktu…</p></div></div>
-                <div class="mt-5 flex items-center justify-between rounded-2xl bg-cream p-4"><div><p class="text-[10px] font-bold uppercase tracking-wider text-muted">Order ID</p><p class="mt-1 font-mono text-xs font-bold text-charcoal">{{ $payment->transaction_id }}</p></div><button type="button" data-copy="{{ $payment->transaction_id }}" class="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-bold text-charcoal shadow-sm"><span class="material-symbols-outlined text-[16px]">content_copy</span>Salin</button></div>
-                @if($vaNumber)<div class="mt-5 rounded-2xl bg-cream p-4"><p class="text-xs text-muted">Nomor Virtual Account {{ strtoupper(data_get($paymentData, 'instruction.bank') ?? data_get($paymentData, 'va_numbers.0.bank', $payment->payment_method)) }}</p><div class="mt-1 flex flex-wrap items-center justify-between gap-3"><p class="break-all font-heading text-2xl font-extrabold tracking-wider text-charcoal">{{ $vaNumber }}</p><button type="button" data-copy="{{ $vaNumber }}" class="rounded-xl border border-charcoal/10 bg-white px-3 py-2 text-xs font-bold text-charcoal">Salin nomor</button></div><ol class="mt-4 list-decimal space-y-1.5 pl-4 text-xs leading-5 text-muted"><li>Buka ATM, mobile banking, atau internet banking bank Anda.</li><li>Pilih menu transfer atau pembayaran Virtual Account.</li><li>Masukkan nomor VA di atas, lalu periksa nama dan nominal pembayaran.</li><li>Selesaikan pembayaran sebelum waktu habis, kemudian tekan Cek Status.</li></ol></div>@endif
-                @if(data_get($paymentData, 'payment_type') === 'echannel')<div class="mt-5 rounded-2xl bg-cream p-4"><p class="text-xs text-muted">Kode pembayaran Mandiri Bill</p><p class="mt-1 font-heading text-2xl font-extrabold tracking-wider text-charcoal">{{ data_get($paymentData, 'instruction.bill_key') ?? data_get($paymentData, 'bill_key') }}</p><p class="mt-2 text-xs text-muted">Biller code: <strong>{{ data_get($paymentData, 'instruction.biller_code') ?? data_get($paymentData, 'biller_code') }}</strong></p><ol class="mt-4 list-decimal space-y-1.5 pl-4 text-xs leading-5 text-muted"><li>Buka Livin', ATM, atau internet banking Mandiri.</li><li>Pilih menu pembayaran atau Mandiri Bill Payment.</li><li>Masukkan biller code dan bill key di atas.</li><li>Konfirmasi nominal, lalu tekan Cek Status setelah pembayaran selesai.</li></ol></div>@endif
+                <div class="flex flex-wrap items-start justify-between gap-4"><div class="flex items-center gap-3"><span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brandsuccess/10 text-brandsuccess"><span class="material-symbols-outlined">payments</span></span><div><p class="text-[11px] font-bold uppercase tracking-wider text-brandsuccess">Instruksi pembayaran</p><h2 class="font-heading text-lg font-extrabold text-charcoal">{{ $paymentData['method_label'] ?? (strtoupper(data_get($paymentData, 'instruction.bank') ?? data_get($paymentData, 'va_numbers.0.bank', $payment->payment_method ?? '')) . ' Virtual Account') }}</h2></div></div><div class="text-right"><p class="text-[10px] font-bold uppercase tracking-wider text-muted">Selesaikan sebelum</p><p class="mt-0.5 text-sm font-extrabold text-brandwarning" data-expiry="{{ $expiryAt }}">24 Jam</p></div></div>
+                <div class="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-cream p-4">
+                    <div class="flex-1 min-w-[200px]">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-muted">Order ID</p>
+                        <input type="text"
+                               id="order-id-input"
+                               readonly
+                               value="{{ $payment->transaction_id }}"
+                               onclick="this.select(); this.setSelectionRange(0, 99999);"
+                               class="mt-1 w-full bg-transparent border-0 p-0 font-mono text-xs font-bold text-charcoal focus:ring-0 cursor-pointer select-all"
+                               title="Klik untuk memilih Order ID">
+                    </div>
+                    <button type="button" onclick="copyFromInput('order-id-input', this)" class="inline-flex items-center gap-1.5 rounded-xl bg-white px-3.5 py-2 text-xs font-bold text-charcoal shadow-sm transition hover:bg-gray-100 active:scale-95"><span class="material-symbols-outlined text-[16px]">content_copy</span><span>Salin</span></button>
+                </div>
+                @if($vaNumber)
+                <div class="mt-5 rounded-2xl bg-cream p-4">
+                    <p class="text-xs text-muted">Nomor Virtual Account {{ strtoupper(data_get($paymentData, 'instruction.bank') ?? data_get($paymentData, 'va_numbers.0.bank', $payment->payment_method)) }}</p>
+                    <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex-1 min-w-[240px]">
+                            <input type="text"
+                                   id="va-number-input"
+                                   readonly
+                                   value="{{ $vaNumber }}"
+                                   onclick="this.select(); this.setSelectionRange(0, 99999);"
+                                   class="w-full bg-white border border-charcoal/10 rounded-xl px-4 py-2.5 font-heading text-2xl sm:text-3xl font-extrabold tracking-wider text-charcoal shadow-sm focus:border-gold focus:ring-2 focus:ring-gold/30 cursor-pointer select-all font-mono"
+                                   title="Klik untuk memilih nomor">
+                        </div>
+                        <button type="button" onclick="copyFromInput('va-number-input', this)" class="inline-flex items-center gap-1.5 rounded-xl bg-charcoal text-white px-5 py-3 text-sm font-bold shadow-md transition hover:bg-charcoal/90 active:scale-95"><span class="material-symbols-outlined text-[18px]">content_copy</span><span>Salin nomor</span></button>
+                    </div>
+                    <ol class="mt-4 list-decimal space-y-1.5 pl-4 text-xs leading-5 text-muted">
+                        <li>Buka ATM, mobile banking, atau internet banking bank Anda.</li>
+                        <li>Pilih menu transfer atau pembayaran Virtual Account.</li>
+                        <li>Masukkan nomor VA di atas, lalu periksa nama dan nominal pembayaran.</li>
+                        <li>Selesaikan pembayaran sebelum waktu habis, kemudian tekan Cek Status.</li>
+                    </ol>
+                </div>
+                @endif
+                @if(data_get($paymentData, 'payment_type') === 'echannel')
+                <div class="mt-5 rounded-2xl bg-cream p-4">
+                    <p class="text-xs text-muted">Kode pembayaran Mandiri Bill</p>
+                    <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex-1 min-w-[200px]">
+                            <input type="text"
+                                   id="mandiri-bill-key-input"
+                                   readonly
+                                   value="{{ data_get($paymentData, 'instruction.bill_key') ?? data_get($paymentData, 'bill_key') }}"
+                                   onclick="this.select(); this.setSelectionRange(0, 99999);"
+                                   class="w-full bg-white border border-charcoal/10 rounded-xl px-4 py-2 font-heading text-xl sm:text-2xl font-extrabold tracking-wider text-charcoal shadow-sm focus:border-gold focus:ring-2 focus:ring-gold/30 cursor-pointer select-all font-mono">
+                        </div>
+                        <button type="button" onclick="copyFromInput('mandiri-bill-key-input', this)" class="inline-flex items-center gap-1.5 rounded-xl bg-charcoal text-white px-4 py-2.5 text-xs font-bold shadow-sm transition hover:bg-charcoal/90 active:scale-95"><span class="material-symbols-outlined text-[16px]">content_copy</span><span>Salin bill key</span></button>
+                    </div>
+                    <p class="mt-2 text-xs text-muted">Biller code: <strong>{{ data_get($paymentData, 'instruction.biller_code') ?? data_get($paymentData, 'biller_code') }}</strong></p>
+                    <ol class="mt-4 list-decimal space-y-1.5 pl-4 text-xs leading-5 text-muted">
+                        <li>Buka Livin', ATM, atau internet banking Mandiri.</li>
+                        <li>Pilih menu pembayaran atau Mandiri Bill Payment.</li>
+                        <li>Masukkan biller code dan bill key di atas.</li>
+                        <li>Konfirmasi nominal, lalu tekan Cek Status setelah pembayaran selesai.</li>
+                    </ol>
+                </div>
+                @endif
                 @if(!$isProduction && in_array(data_get($paymentData, 'payment_type'), ['bank_transfer', 'echannel'], true))<form method="POST" action="{{ route('customer.payment.sandbox-simulator', $booking) }}" class="mt-5">@csrf<button type="submit" class="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-gold/35 bg-gold/10 px-4 text-sm font-extrabold text-charcoal transition hover:bg-gold/20"><span class="material-symbols-outlined text-[19px]">science</span>Buka Simulator VA Sandbox</button></form><p class="mt-2 text-center text-[11px] leading-4 text-muted">Khusus testing: masukkan nomor VA, atau biller code dan bill key Mandiri, pada simulator resmi Midtrans.</p>@endif
                 @if($qrUrl)<div class="mt-5 flex flex-col items-center rounded-2xl bg-cream p-5 text-center"><p class="mb-3 text-sm font-bold text-charcoal">Scan QRIS untuk membayar</p><img src="{{ $qrUrl }}" alt="Kode QRIS pembayaran" class="h-56 w-56 rounded-xl bg-white p-2 shadow-sm"><a href="{{ $qrUrl }}" download class="mt-4 inline-flex items-center gap-2 rounded-xl border border-charcoal/15 bg-white px-4 py-2.5 text-xs font-bold text-charcoal"><span class="material-symbols-outlined text-[17px]">download</span>Download QRIS</a><p class="mt-3 text-xs text-muted">Buka aplikasi pembayaran Anda, lalu pindai kode QR di atas.</p></div>@endif
                 @if($walletUrl)<div class="mt-5 rounded-2xl bg-cream p-5 text-center"><span class="material-symbols-outlined text-4xl text-gold">smartphone</span><p class="mt-2 text-sm font-extrabold text-charcoal">Lanjutkan di aplikasi {{ $paymentData['method_label'] ?? 'e-wallet' }}</p><p class="mt-1 text-xs text-muted">Buka aplikasi untuk menyelesaikan pembayaran dengan aman.</p><a href="{{ $walletUrl }}" class="mt-4 inline-flex min-h-12 items-center justify-center rounded-xl bg-charcoal px-5 text-sm font-extrabold text-white">Buka aplikasi pembayaran</a></div>@endif
@@ -170,10 +226,10 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">progress_activity</span> Menyiapkan pembayaran...';
             snap.pay(@json($payment->snap_token), {
-                onSuccess: () => showPaymentStatus('success', 'Pembayaran berhasil', 'Pembayaran telah diterima. Tekan tombol di bawah untuk menyinkronkan status booking.'),
-                onPending: () => showPaymentStatus('pending', 'Menunggu pembayaran', 'Instruksi pembayaran sudah dibuat. Selesaikan pembayaran lalu cek status booking.'),
+                onSuccess: () => document.getElementById('check-status-form').submit(),
+                onPending: () => document.getElementById('check-status-form').submit(),
                 onError: () => { document.getElementById('pay-error').textContent = 'Pembayaran belum dapat diproses. Silakan coba kembali dalam beberapa saat.'; document.getElementById('pay-error').classList.remove('hidden'); btn.disabled = false; btn.innerHTML = label; },
-                onClose: () => { btn.disabled = false; btn.innerHTML = label; }
+                onClose: () => document.getElementById('check-status-form').submit()
             });
         });
         @else
@@ -184,5 +240,94 @@
         @endif
         const countdown = document.getElementById('payment-countdown');
         if (countdown) { let seconds = 24 * 60 * 60; setInterval(() => { seconds = Math.max(0, seconds - 1); const h = String(Math.floor(seconds / 3600)).padStart(2, '0'), m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0'), s = String(seconds % 60).padStart(2, '0'); countdown.textContent = `${h}:${m}:${s}`; }, 1000); }
+        document.querySelectorAll('[data-expiry]').forEach((el) => {
+            const raw = el.dataset.expiry;
+            if (raw) {
+                const d = new Date(raw.replace(' ', 'T'));
+                if (!isNaN(d.getTime())) {
+                    el.textContent = d.toLocaleString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+                }
+            }
+        });
+        window.copyFromInput = function (inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+
+            input.focus();
+            input.select();
+            input.setSelectionRange(0, 99999);
+
+            let copied = false;
+            try {
+                copied = document.execCommand('copy');
+            } catch (e) {
+                copied = false;
+            }
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(input.value).then(() => {
+                    copied = true;
+                }).catch(() => {});
+            }
+
+            const originalHtml = btn.getAttribute('data-original-html') || btn.innerHTML;
+            if (!btn.getAttribute('data-original-html')) {
+                btn.setAttribute('data-original-html', originalHtml);
+            }
+
+            btn.innerHTML = '<span class="material-symbols-outlined text-[18px] text-emerald-400">check_circle</span> <span class="text-emerald-300 font-bold">Tersalin!</span>';
+            btn.classList.add('ring-2', 'ring-emerald-400', 'bg-emerald-800');
+            setTimeout(() => {
+                btn.innerHTML = btn.getAttribute('data-original-html') || originalHtml;
+                btn.classList.remove('ring-2', 'ring-emerald-400', 'bg-emerald-800');
+            }, 2000);
+        };
+
+        window.copyText = function (text, btn) {
+            if (!text) return;
+            const cleanText = String(text).trim();
+
+            const temp = document.createElement('textarea');
+            temp.value = cleanText;
+            temp.style.position = 'fixed';
+            temp.style.top = '0';
+            temp.style.left = '0';
+            temp.style.width = '2em';
+            temp.style.height = '2em';
+            temp.style.padding = '0';
+            temp.style.border = 'none';
+            temp.style.outline = 'none';
+            temp.style.boxShadow = 'none';
+            temp.style.background = 'transparent';
+            document.body.appendChild(temp);
+            temp.focus();
+            temp.select();
+            temp.setSelectionRange(0, temp.value.length);
+
+            let success = false;
+            try {
+                success = document.execCommand('copy');
+            } catch (err) {
+                success = false;
+            }
+            document.body.removeChild(temp);
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(cleanText).catch(() => {});
+            }
+
+            if (btn) {
+                const originalHtml = btn.getAttribute('data-original-html') || btn.innerHTML;
+                if (!btn.getAttribute('data-original-html')) {
+                    btn.setAttribute('data-original-html', originalHtml);
+                }
+                btn.innerHTML = '<span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span> <span class="text-emerald-700 font-bold">Tersalin!</span>';
+                btn.classList.add('border-emerald-400', 'bg-emerald-50');
+                setTimeout(() => {
+                    btn.innerHTML = btn.getAttribute('data-original-html') || originalHtml;
+                    btn.classList.remove('border-emerald-400', 'bg-emerald-50');
+                }, 2000);
+            }
+        };
     </script>
 @endpush

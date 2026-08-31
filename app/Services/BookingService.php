@@ -187,6 +187,9 @@ class BookingService
 
     protected function maybeMarkScheduleFull(Schedule $schedule): void
     {
+        // Lock schedule untuk prevent race condition saat concurrent bookings
+        $schedule = Schedule::where('id', $schedule->id)->lockForUpdate()->first();
+        
         $start = $this->timeOnSchedule($schedule, $schedule->start_time->format('H:i:s'));
         $end = $this->timeOnSchedule($schedule, $schedule->end_time->format('H:i:s'));
         $bookings = $this->activeBookings($schedule);

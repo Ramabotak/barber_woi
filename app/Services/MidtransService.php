@@ -70,7 +70,9 @@ class MidtransService
         ], $channel->payload($method, array_merge($options, ['bill_info2' => $booking->booking_code])));
         if ($url = config('midtrans.notification_url')) $payload['notification_url'] = $url;
 
-        $response = Http::acceptJson()->asJson()->withBasicAuth(config('midtrans.server_key'), '')
+        $response = $this->httpClient()
+
+
             ->post($this->coreUrl('/v2/charge'), $payload)->throw()->json();
         $response['method_key'] = $method;
         $response['method_label'] = $this->methodLabel($method);
@@ -85,7 +87,7 @@ class MidtransService
 
     public function getStatus(string $orderId): array
     {
-        return Http::acceptJson()->withBasicAuth(config('midtrans.server_key'), '')
+        return $this->httpClient()
             ->get($this->coreUrl('/v2/' . rawurlencode($orderId) . '/status'))->throw()->json();
     }
 
@@ -121,6 +123,18 @@ class MidtransService
     }
 
     private function coreUrl(string $path): string { return (config('midtrans.is_production') ? 'https://api.midtrans.com' : 'https://api.sandbox.midtrans.com') . $path; }
+
+    private function httpClient()
+    {
+        $client = Http::acceptJson()->asJson()->withBasicAuth(config('midtrans.server_key'), '');
+        
+        // Bypass SSL verification only in local development to handle firewall/proxy issues
+        if (!config('midtrans.is_production') && app()->environment('local')) {
+            $client = $client->withOptions(['verify' => false]);
+        }
+        
+        return $client;
+    }
     /** Normalize bank-transfer and Mandiri Bill details so checkout has one stable shape. */
     private function instructionData(array $response): array
     {
@@ -150,3 +164,4 @@ class MidtransService
     }
     private function methodLabel(string $method): string { return ['qris' => 'QRIS', 'credit_card' => 'Kartu Kredit', 'mandiri_bill' => 'Mandiri Bill', 'gopay' => 'GoPay', 'shopeepay' => 'ShopeePay'][$method] ?? strtoupper($method) . ' Virtual Account'; }
 }
+

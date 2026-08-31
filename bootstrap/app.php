@@ -9,11 +9,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
+        channels: __DIR__.'/../routes/channels.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias([
+$middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'ensure_barber_profile' => \App\Http\Middleware\EnsureBarberProfileExists::class,
         ]);
 
         // Percaya header dari reverse proxy (ngrok, nginx, load balancer, dll)

@@ -26,6 +26,8 @@ class NotificationController extends Controller
     // Dipoll berkala dari browser (lihat resources/js/app.js) untuk badge & toast pop-up.
     public function latest(Request $request): JsonResponse
     {
+        abort_unless($request->user(), 401, 'Unauthorized');
+        
         $notifications = $request->user()->notifications()
             ->orderByDesc('created_at')
             ->limit(10)

@@ -58,14 +58,14 @@
         </div>
     @endif
 
-    <section class="relative mb-8 flex min-h-[380px] items-center overflow-hidden rounded-xl bg-charcoal px-6 py-10 text-white sm:min-h-[420px] sm:px-9 sm:py-12">
+    <section class="customer-dashboard-hero relative mb-8 flex min-h-[380px] items-center overflow-hidden rounded-xl bg-charcoal px-6 py-10 text-white sm:min-h-[420px] sm:px-9 sm:py-12">
         <img src="{{ asset('images/hero-barber-shop.jpg') }}" alt="Interior barbershop Barber Woi" class="absolute inset-0 h-full w-full object-cover object-center">
         <div class="absolute inset-y-0 left-0 w-[58%] bg-gradient-to-r from-charcoal/70 via-charcoal/35 to-transparent"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/10"></div>
         <div class="relative z-10 max-w-2xl">
-            <span class="mb-4 inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11px] font-bold tracking-wider text-gold">PREMIUM GROOMING <span class="h-1 w-1 rounded-full bg-gold"></span> MUDAH & CEPAT</span>
-            <h2 class="font-heading text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Waktunya tampil lebih percaya diri.</h2>
-            <p class="mt-3 max-w-xl text-sm leading-6 text-cream/70 sm:text-base">Pilih barber favoritmu, tentukan jadwal, dan booking dalam hitungan menit.</p>
+            <span class="mb-4 inline-flex items-center gap-2 border border-gold/30 bg-gold/10 px-3 py-1 text-[10px] font-extrabold tracking-[0.16em] text-gold">RESERVATION DESK <span class="h-1 w-1 rounded-full bg-gold"></span> TANPA TEBAK-TEBAKAN</span>
+            <h2 class="font-heading text-3xl font-extrabold leading-[1.05] tracking-[-0.04em] sm:text-4xl">Pilih waktu yang terasa tepat.</h2>
+            <p class="mt-3 max-w-xl text-sm leading-6 text-cream/70 sm:text-base">Setiap slot dibuat untuk satu keputusan sederhana: barber yang Anda mau, pada waktu yang Anda pegang.</p>
             <div class="mt-6 flex flex-wrap gap-3">
                 <a href="{{ route('customer.booking.create') }}" class="inline-flex min-h-11 items-center justify-center rounded-lg bg-gold px-5 py-3 text-sm font-bold text-charcoal transition-colors hover:bg-[#dbb45d]">Booking Sekarang <span class="material-symbols-outlined ml-2 text-[18px]">arrow_forward</span></a>
                 <a href="#barber-pilihan" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/20 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10">Lihat Barber</a>

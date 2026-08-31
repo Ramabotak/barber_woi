@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Barber;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Models\Review;
 use App\Models\Schedule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -50,6 +51,24 @@ class DashboardController extends Controller
         $chartLabels = $chartDates->map(fn (Carbon $date) => $date->isoFormat('ddd'))->values();
         $chartValues = $chartDates->map(fn (Carbon $date) => (float) ($weeklyRevenue[$date->toDateString()] ?? 0))->values();
 
-        return view('barber.dashboard', compact('pendingBookings', 'servingBookings', 'todaySchedules', 'barber', 'todayBookings', 'availableSlots', 'revenueToday', 'revenueChange', 'remainingWorkMinutes', 'chartLabels', 'chartValues'));
+        $reviews = Review::with(['customer'])
+            ->whereHas('booking', fn ($query) => $query->where('barber_id', $barber->id))
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+
+        return view('barber.dashboard', compact('pendingBookings', 'servingBookings', 'todaySchedules', 'barber', 'todayBookings', 'availableSlots', 'revenueToday', 'revenueChange', 'remainingWorkMinutes', 'chartLabels', 'chartValues', 'reviews'));
+    }
+
+    public function profile(Request $request): View
+    {
+        $barber = $request->user()->barber;
+        abort_unless($barber, 403, 'Akun Anda belum terhubung dengan data barber.');
+
+        $reviews = Review::with(['customer'])
+            ->whereHas('booking', fn ($query) => $query->where('barber_id', $barber->id))
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('barber.profile.index', compact('barber', 'reviews'));
     }
 }

@@ -14,7 +14,6 @@ class ScheduleController extends Controller
     public function index(Request $request): View
     {
         $barber = $request->user()->barber;
-        abort_unless($barber, 403);
 
         $schedules = Schedule::where('barber_id', $barber->id)
             ->where('date', '>=', now()->toDateString())
@@ -37,14 +36,19 @@ class ScheduleController extends Controller
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
         ]);
 
-        // Cegah bikin jadwal yang bentrok/duplikat persis di tanggal & jam yang sama.
-        $exists = Schedule::where('barber_id', $barber->id)
+        // Cegah membuat jadwal yang bertabrakan (overlap) dengan jadwal lain di hari yang sama.
+        $overlapping = Schedule::where('barber_id', $barber->id)
             ->where('date', $validated['date'])
-            ->where('start_time', $validated['start_time'])
-            ->exists();
+            ->where('start_time', '<', $validated['end_time'])
+            ->where('end_time', '>', $validated['start_time'])
+            ->first();
 
-        if ($exists) {
-            return back()->withErrors(['start_time' => 'Jadwal di tanggal & jam ini sudah ada.']);
+        if ($overlapping) {
+            $existingStart = \Carbon\Carbon::parse($overlapping->start_time)->format('H:i');
+            $existingEnd = \Carbon\Carbon::parse($overlapping->end_time)->format('H:i');
+            return back()->withInput()->withErrors([
+                'start_time' => "Jadwal bertabrakan dengan jadwal yang sudah ada ({$existingStart} – {$existingEnd} WIB).",
+            ]);
         }
 
         Schedule::create([
@@ -58,14 +62,16 @@ class ScheduleController extends Controller
         return back()->with('success', 'Jadwal berhasil ditambahkan.');
     }
 
-    // Hapus jadwal yang belum ada booking sama sekali.
+    // Hapus jadwal jika tidak ada booking aktif/selesai (hanya boleh jika 0 booking atau semua booking cancelled).
     public function destroy(Request $request, Schedule $schedule): RedirectResponse
     {
         $barber = $request->user()->barber;
         abort_unless($barber && $schedule->barber_id === $barber->id, 403);
 
-        $hasBookings = $schedule->bookings()->exists();
-        abort_if($hasBookings, 422, 'Jadwal ini sudah punya booking, tidak bisa dihapus.');
+        $hasActiveOrCompleted = $schedule->bookings()->whereNotIn('status', ['cancelled'])->exists();
+        if ($hasActiveOrCompleted) {
+            return back()->withErrors(['schedule' => 'Jadwal ini memiliki booking yang aktif atau sudah selesai, sehingga tidak bisa dihapus. Silakan gunakan opsi Tutup Jadwal.']);
+        }
 
         $schedule->delete();
 
@@ -79,7 +85,9 @@ class ScheduleController extends Controller
         abort_unless($barber && $schedule->barber_id === $barber->id, 403);
 
         $hasActive = $schedule->bookings()->whereNotIn('status', ['completed', 'cancelled'])->exists();
-        abort_if($hasActive, 422, 'Masih ada antrean aktif pada jadwal ini.');
+        if ($hasActive) {
+            return back()->withErrors(['schedule' => 'Masih ada antrean aktif pada jadwal ini, tidak dapat menutup shift sekarang.']);
+        }
 
         $schedule->update(['status' => 'libur']);
 

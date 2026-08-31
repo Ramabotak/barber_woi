@@ -1,0 +1,9 @@
+*** Begin Patch
+*** Update File: app/Models/Booking.php
+@@ protected $casts = [
+-        'slot_time' => 'datetime',
++        'slot_time' => 'datetime:H:i:s',
+         'check_in_time' => 'datetime',
+         'finished_at' => 'datetime',
+     ];
+*** End Patch

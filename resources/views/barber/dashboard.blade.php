@@ -9,7 +9,7 @@
     @endphp
     <div class="mx-auto flex max-w-[1200px] flex-col gap-6">
         <header>
-            <h1 class="font-['Plus_Jakarta_Sans'] text-[28px] font-semibold tracking-tight text-[#1a1c1c]">Ringkasan Hari Ini</h1>
+            <h1 class="font-['Plus_Jakarta_Sans'] text-[28px] font-semibold tracking-tight text-[#1a1c1c]">Dashboard</h1>
             <p class="mt-1 text-sm text-[#46464a]">{{ now()->translatedFormat('l, d F Y') }}</p>
         </header>
 

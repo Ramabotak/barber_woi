@@ -133,8 +133,15 @@
 
     @push('scripts')
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    function renderAdminDashboardCharts() {
+        if (typeof Chart === 'undefined') {
+            setTimeout(renderAdminDashboardCharts, 50);
+            return;
+        }
+
         const revenueCtx = document.getElementById('revenueChart');
+        if (!revenueCtx) return;
+
         const formatRupiah = (amount) => 'Rp ' + Number(amount).toLocaleString('id-ID', {
             maximumFractionDigits: 0,
         });
@@ -214,37 +221,45 @@
         });
 
         const statusCtx = document.getElementById('statusChart');
-        new Chart(statusCtx, {
-            type: 'doughnut',
-            data: {
-                labels: @json($statusChartLabels),
-                datasets: [{
-                    data: @json($statusChartData),
-                    backgroundColor: [
-                        '#9CA3AF', // pending
-                        '#34D399', // paid
-                        '#60A5FA', // accepted
-                        '#C9A24B', // waiting
-                        '#F87171', // late
-                        '#3B82F6', // serving
-                        '#1C1C1E', // completed
-                        '#EF4444', // cancelled
-                    ],
-                    borderWidth: 0,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { boxWidth: 10, font: { family: 'Inter', size: 11 }, color: '#46464a' }
+        if (statusCtx) {
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: @json($statusChartLabels),
+                    datasets: [{
+                        data: @json($statusChartData),
+                        backgroundColor: [
+                            '#9CA3AF', // pending
+                            '#34D399', // paid
+                            '#60A5FA', // accepted
+                            '#C9A24B', // waiting
+                            '#F87171', // late
+                            '#3B82F6', // serving
+                            '#1C1C1E', // completed
+                            '#EF4444', // cancelled
+                        ],
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 10, font: { family: 'Inter', size: 11 }, color: '#46464a' }
+                        }
                     }
                 }
-            }
-        });
-    });
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', renderAdminDashboardCharts);
+    } else {
+        renderAdminDashboardCharts();
+    }
     </script>
     @endpush
 @endsection

@@ -341,7 +341,11 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        function renderReportCharts() {
+            if (typeof Chart === 'undefined') {
+                setTimeout(renderReportCharts, 50);
+                return;
+            }
             const formatRupiah = (value) => 'Rp ' + Number(value || 0).toLocaleString('id-ID');
             const flowCanvas = document.getElementById('financialFlowChart');
             if (flowCanvas) {
@@ -385,6 +389,12 @@
                     },
                 });
             }
-        });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderReportCharts);
+        } else {
+            renderReportCharts();
+        }
     </script>
 @endpush

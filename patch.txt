@@ -1,0 +1,40 @@
+*** Begin Patch
+*** Update File: app/Services/MidtransService.php
+@@ -26,6 +26,7 @@
+     public function __construct()
+     {
+         Config::\ = config('midtrans.server_key');
+         Config::\ = config('midtrans.is_production');
+         Config::\ = true;
+         Config::\ = true;
+@@ -59,7 +60,7 @@
+-        \ = Http::acceptJson()->asJson()->withBasicAuth(config('midtrans.server_key'), '')
+-            ->post(\->coreUrl('/v2/charge'), \)->throw()->json();
++        \ = \->httpClient()
++            ->post(\->coreUrl('/v2/charge'), \)->throw()->json();
+         \['method_key'] = \;
+         \['method_label'] = \->methodLabel(\);
+@@ -75,7 +76,7 @@
+     public function getStatus(string \): array
+     {
+-        return Http::acceptJson()->withBasicAuth(config('midtrans.server_key'), '')
+-            ->get(\->coreUrl('/v2/' . rawurlencode(\) . '/status'))->throw()->json();
++        return \->httpClient()
++            ->get(\->coreUrl('/v2/' . rawurlencode(\) . '/status'))->throw()->json();
+     }
+@@ -106,6 +107,16 @@
+     private function coreUrl(string \): string { return (config('midtrans.is_production') ? 'https://api.midtrans.com' : 'https://api.sandbox.midtrans.com') . \; }
++    
++    private function httpClient()
++    {
++        \ = Http::acceptJson()->asJson()->withBasicAuth(config('midtrans.server_key'), '');
++        
++        // Bypass SSL verification only in local development to handle firewall/proxy issues
++        if (!config('midtrans.is_production') && app()->environment('local')) {
++            \ = \->withOptions(['verify' => false]);
++        }
++        
++        return \;
++    }
+     /** Normalize bank-transfer and Mandiri Bill details so checkout has one stable shape. */
+*** End Patch
